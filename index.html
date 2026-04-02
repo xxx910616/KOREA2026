@@ -8,6 +8,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- 引入 SortableJS 用於拖移排序 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
     <style>
         :root {
             --light-blue: #f0f4f8;
@@ -91,26 +93,30 @@
         }
         .tag-pill.active { background: var(--accent-purple); color: white; border-color: var(--accent-purple); }
 
-        .item-list { display: flex; flex-direction: column; gap: 12px; }
+        .item-list { display: flex; flex-direction: column; gap: 12px; min-height: 50px; }
 
         .item-row {
             background: rgba(248, 250, 252, 0.6); border-radius: 18px; padding: 15px;
-            display: flex; align-items: center; gap: 12px; cursor: pointer;
+            display: flex; align-items: center; gap: 12px; cursor: grab;
             transition: all 0.2s ease; border: 1px solid rgba(226, 232, 240, 0.8);
+            user-select: none;
         }
 
-        .item-row:active { transform: scale(0.98); background: #e2e8f0; }
+        .item-row:active { cursor: grabbing; transform: scale(0.98); }
+        .sortable-ghost { opacity: 0.4; background: var(--soft-yellow); border: 2px dashed var(--accent-blue); }
 
         .time-box { width: 45px; text-align: center; font-size: 12px; font-weight: 800; color: var(--accent-blue); border-right: 1px solid #e2e8f0; padding-right: 8px; }
         .time-box.hidden { display: none; }
         
         .content-box { flex: 1; }
         .item-name { font-size: 14px; font-weight: 700; margin-bottom: 4px; color: var(--text-dark); line-height: 1.4; }
-        .item-desc { font-size: 11px; color: var(--text-gray); margin-bottom: 4px; } /* 行前備註樣式 */
+        .item-desc { font-size: 11px; color: var(--text-gray); margin-bottom: 4px; }
         .item-meta { font-size: 10px; color: var(--text-gray); display: flex; flex-wrap: wrap; gap: 6px; }
         
         .meta-tag { background: #cbd5e1; color: #475569; padding: 2px 6px; border-radius: 6px; font-weight: 500; display: inline-flex; align-items: center; gap: 3px; }
         .meta-tag.tag-area { background: #d1d5db; color: #374151; }
+
+        .drag-handle { color: #cbd5e1; font-size: 12px; cursor: grab; padding-right: 4px; }
 
         .modal-overlay {
             position: fixed; inset: 0; background: rgba(51, 65, 85, 0.6);
@@ -209,56 +215,57 @@
 
     const defaultData = {
         start: [
-            { name: '🔌 自備插座轉接頭', detail: '圓形 4.8mm 雙孔', emoji: '🔌' },
-            { name: '💰 在台灣換 20 萬韓幣', detail: '另備台幣備用', emoji: '💰' },
-            { name: '💳 刷卡手續費 1.5%', detail: '滿 ₩15000 可退稅', emoji: '💳' },
-            { name: '1. 藝人韓服 ✅', detail: '預約 TWD 245/人', emoji: '👘', address: '서울 종로구 자하문로1가길 5 . 3층' },
-            { name: '2. 愛寶樂園門票 ✅', detail: '預約 TWD 705/人', emoji: '🎢' },
-            { name: '3. ESIM (5天10G)', detail: '$279/人', emoji: '📱' },
-            { name: '🏨 Aank Hotel Yeondengpo', detail: '서울 영등포구 영중로10길 10', emoji: '🏨', address: '서울 영등포구 영중로10길 10' }
+            { id: 's1', name: '🔌 自備插座轉接頭', detail: '圓形 4.8mm 雙孔', emoji: '🔌' },
+            { id: 's2', name: '💰 在台灣換 20 萬韓幣', detail: '另備台幣備用', emoji: '💰' },
+            { id: 's3', name: '💳 刷卡手續費 1.5%', detail: '滿 ₩15000 可退稅', emoji: '💳' },
+            { id: 's4', name: '1. 藝人韓服 ✅', detail: '預約 TWD 245/人', emoji: '👘', address: '서울 종로구 자하문로1가길 5 . 3층' },
+            { id: 's5', name: '2. 愛寶樂園門票 ✅', detail: '預約 TWD 705/人', emoji: '🎢' },
+            { id: 's6', name: '3. ESIM (5天10G)', detail: '$279/人', emoji: '📱' },
+            { id: 's7', name: '🏨 Aank Hotel Yeondengpo', detail: '서울 영등포구 영중로10길 10', emoji: '🏨', address: '서울 영등포구 영중로10길 10' }
         ],
         days: {
             1: [
-                { time: '21:35', name: '抵達仁川 🛬', address: 'ICN Airport', transport: '17:55-21:35', emoji: '🛫' },
-                { time: '22:30', name: '飯店 Check-in', address: '서울 영등포구 영중로10길 10', transport: '機場接送', money: '₩13000/人', emoji: '🏨' },
-                { time: '23:30', name: '東大門批發 (The mask shop / APM / Nyunyu)', address: '서울 中區 退溪路73街 36 1層', transport: '公車 / UBER', emoji: '🛍️', area: '東大門' },
-                { time: '01:00', name: '🥩 大成精肉店 대성정육식당', address: '서울 용산구 서빙고로95길 22', transport: 'UBER', money: '₩20000/人', emoji: '🥩' },
-                { time: '02:30', name: '回飯店休息', address: '서울 영등포구 영중로10길 10 아늑호텔 영등포점', transport: 'UBER / 夜間公車', emoji: '🛌' }
+                { id: 'd1-1', time: '21:35', name: '抵達仁川 🛬', address: 'ICN Airport', transport: '17:55-21:35', emoji: '🛫' },
+                { id: 'd1-2', time: '22:30', name: '飯店 Check-in', address: '서울 영등포구 영중로10길 10', transport: '機場接送', money: '₩13000/人', emoji: '🏨' },
+                { id: 'd1-3', time: '23:30', name: '東大門批發 (The mask shop / APM / Nyunyu)', address: '서울 中區 退溪路73街 36 1層', transport: '公車 / UBER', emoji: '🛍️', area: '東大門' },
+                { id: 'd1-4', time: '01:00', name: '🥩 大成精肉店 대성정육식당', address: '서울 용산구 서빙고로95길 22', transport: 'UBER', money: '₩20000/人', emoji: '🥩' },
+                { id: 'd1-5', time: '02:30', name: '回飯店休息', address: '서울 영등포구 영중로10길 10 아늑호텔 영등포점', transport: 'UBER / 夜間公車', emoji: '🛌' }
             ],
             2: [
-                { time: '09:00', name: '景福宮 경복궁', address: '서울특별시 종羅구 사직로 161', transport: '地鐵 5 號線', emoji: '🏛️' },
-                { time: '10:00', name: '藝人韓服預約 ✅', address: '서울 종羅區 자하문로1가길 5 . 3層', transport: '🚶🏻‍➡️ 步行', money: 'TWD 245', emoji: '👘' },
-                { time: '12:30', name: '🦀 順美家幸福的醬蟹 순미네행복게장', address: '서울 中區 乙支路43街 38 2層', transport: '地鐵 / 🚶🏻‍➡️', emoji: '🦀', area: '東大門' },
-                { time: '14:00', name: '🐔 孔陵一隻雞 공陵닭한마리', address: '서울 종羅區 종羅40가길 20', transport: '🚶🏻‍➡️ 步行', emoji: '🍗' },
-                { time: '15:30', name: '廣藏市場 🍢', address: '서울특별시 종로구 창경궁로 88', transport: '🚶🏻‍➡️ 步行', emoji: '🍢', area: '廣藏' },
-                { time: '16:30', name: '明洞 + 樂天百貨', address: '서울특별시 중구 명動2家', transport: '地鐵 / 公車', emoji: '🏙️', area: '明洞' },
-                { time: '18:30', name: '首爾車站樂天超市', address: '서울 中區 漢江大路 405', transport: '地鐵 / 公車', emoji: '🛒' },
-                { time: '20:00', name: '🥩 明倫進士燒烤 명倫진사갈비', address: '서울 영등포구 영중로10길 20', transport: '🚶🏻‍➡️ 步行', money: '₩21900/人', emoji: '🥩' }
+                { id: 'd2-1', time: '09:00', name: '景福宮 경복궁', address: '서울특별시 종羅구 사직로 161', transport: '地鐵 5 號線', emoji: '🏛️' },
+                { id: 'd2-2', time: '10:00', name: '藝人韓服預約 ✅', address: '서울 종羅區 자하문로1가길 5 . 3層', transport: '🚶🏻‍➡️ 步行', money: 'TWD 245', emoji: '👘' },
+                { id: 'd2-3', time: '12:30', name: '🦀 順美家幸福的醬蟹 순미네행복게장', address: '서울 中區 乙支路43街 38 2層', transport: '地鐵 / 🚶🏻‍➡️', emoji: '🦀', area: '東大門' },
+                { id: 'd2-4', time: '14:00', name: '🐔 孔陵一隻雞 공陵닭한마리', address: '서울 종羅區 종羅40가길 20', transport: '🚶🏻‍➡️ 步行', emoji: '🍗' },
+                { id: 'd2-5', time: '15:30', name: '廣藏市場 🍢', address: '서울특별시 종로구 창경궁로 88', transport: '🚶🏻‍➡️ 步行', emoji: '🍢', area: '廣藏' },
+                { id: 'd2-6', time: '16:30', name: '明洞 + 樂天百貨', address: '서울특별시 중구 명動2家', transport: '地鐵 / 公車', emoji: '🏙️', area: '明洞' },
+                { id: 'd2-7', time: '18:30', name: '首爾車站樂天超市', address: '서울 中區 漢江大路 405', transport: '地鐵 / 公車', emoji: '🛒' },
+                { id: 'd2-8', time: '20:00', name: '🥩 明倫進士燒烤 명倫진사갈비', address: '서울 영등포구 영중로10길 20', transport: '🚶🏻‍➡️ 步行', money: '₩21900/人', emoji: '🥩' }
             ],
             3: [
-                { time: '10:00', name: '出發漢南洞', address: '서울 용산구 이태元로54가길 4', transport: '地鐵 5 轉 6 號線', emoji: '🚇', area: '漢南洞' },
-                { time: '12:00', name: '🐷 安木豬肉湯飯 안목 성수국밥', address: '서울 성동구 뚝섬로13길 34 1層', transport: '地鐵 2 號線', money: '₩13000/人', emoji: '🐷', area: '聖水洞' },
-                { time: '13:30', name: '聖水洞逛街 (Dior/Ader/etc)', address: '서울 성동구 연務章11길 19', transport: '🚶🏻‍➡️ 步行', emoji: '☕', area: '聖水洞' },
-                { time: '18:00', name: '🍜 JOJO 刀削麵 조조칼국수', address: '서울 성동구 성수일路8길 55 1層', transport: '🚶🏻‍➡️ 步行', money: '₩10000/人', emoji: '🍜', area: '聖水洞' }
+                { id: 'd3-1', time: '10:00', name: '出發漢南洞', address: '서울 용산구 이태元로54가길 4', transport: '地鐵 5 轉 6 號線', emoji: '🚇', area: '漢南洞' },
+                { id: 'd3-2', time: '12:00', name: '🐷 安木豬肉湯飯 안목 성수국밥', address: '서울 성동구 뚝섬로13길 34 1層', transport: '地鐵 2 號線', money: '₩13000/人', emoji: '🐷', area: '聖水洞' },
+                { id: 'd3-3', time: '13:30', name: '聖水洞逛街 (Dior/Ader/etc)', address: '서울 성동구 연務章11길 19', transport: '🚶🏻‍➡️ 步行', emoji: '☕', area: '聖水洞' },
+                { id: 'd3-4', time: '18:00', name: '🍜 JOJO 刀削麵 조조칼국수', address: '서울 성동구 성수일路8길 55 1層', transport: '🚶🏻‍➡️ 步行', money: '₩10000/人', emoji: '🍜', area: '聖水洞' }
             ],
             4: [
-                { time: '09:00', name: '專車出發 🎢', transport: '預約專車接送', emoji: '🚐' },
-                { time: '10:00', name: '愛寶樂園 에버랜드', address: '경기도 용인시 처인구 포곡읍 에버랜드로 199', emoji: '🎢' },
-                { time: '16:00', name: '醫美行程 (弘大)', address: '서울 마포구', transport: '專車 / UBER', emoji: '🏥', area: '弘大' },
-                { time: '18:00', name: '🐙 Hongs Zzuggumi 辣炒章魚', address: '서울 마포구 어울마당로 146', transport: '🚶🏻‍➡️ 步行', money: '₩16000/人', emoji: '🐙', area: '弘大' },
-                { time: '22:30', name: 'GOP 곱牛腸 文來本底', address: '서울 영등포구 당산로 34 118號', transport: '地鐵 / UBER', money: '₩11500/人起', emoji: '🥘' }
+                { id: 'd4-1', time: '09:00', name: '專車出發 🎢', transport: '預約專車接送', emoji: '🚐' },
+                { id: 'd4-2', time: '10:00', name: '愛寶樂園 에버랜드', address: '경기도 용인시 처인구 포곡읍 에버랜드로 199', emoji: '🎢' },
+                { id: 'd4-3', time: '16:00', name: '醫美行程 (弘大)', address: '서울 마포구', transport: '專車 / UBER', emoji: '🏥', area: '弘大' },
+                { id: 'd4-4', time: '18:00', name: '🐙 Hongs Zzuggumi 辣炒章魚', address: '서울 마포구 어울마당로 146', transport: '🚶🏻‍➡️ 步行', money: '₩16000/人', emoji: '🐙', area: '弘大' },
+                { id: 'd4-5', time: '22:30', name: 'GOP 곱牛腸 文來本底', address: '서울 영등포구 당산로 34 118號', transport: '地鐵 / UBER', money: '₩11500/人起', emoji: '🥘' }
             ],
             5: [
-                { time: '10:30', name: '出發往機場 🛫', address: 'ICN Airport', emoji: '✈️' },
-                { time: '14:45', name: '搭機返台', transport: '航班回程', emoji: '🇹🇼' }
+                { id: 'd5-1', time: '10:30', name: '出發往機場 🛫', address: 'ICN Airport', emoji: '✈️' },
+                { id: 'd5-2', time: '14:45', name: '搭機返台', transport: '航班回程', emoji: '🇹🇼' }
             ]
         },
         pockets: [] 
     };
 
-    let userItinerary = JSON.parse(localStorage.getItem('korea_travel_v11')) || defaultData;
+    let userItinerary = JSON.parse(localStorage.getItem('korea_travel_v12')) || defaultData;
     let currentTab = 'start';
     let currentPocketFilter = '全部';
+    let sortableInstance = null;
 
     function render() {
         const area = document.getElementById('content-area');
@@ -292,29 +299,31 @@
 
         const list = document.createElement('div');
         list.className = 'item-list';
+        list.id = 'draggable-list';
         
         let items = [];
         if (currentTab === 'start') {
-            items = (userItinerary.start || []).map((item, originalIdx) => ({...item, originalIdx}));
+            items = userItinerary.start || [];
         } else if (currentTab === 'pockets') {
-            const allPockets = userItinerary.pockets || [];
-            items = allPockets.map((item, originalIdx) => ({...item, originalIdx}));
+            items = userItinerary.pockets || [];
             if (currentPocketFilter !== '全部') {
                 items = items.filter(i => i.area === currentPocketFilter);
             }
         } else {
-            items = (userItinerary.days[currentTab] || []).map((item, originalIdx) => ({...item, originalIdx}));
+            items = userItinerary.days[currentTab] || [];
         }
 
-        items.forEach((item) => {
+        items.forEach((item, index) => {
             const row = document.createElement('div');
             row.className = 'item-row';
-            row.onclick = () => showDetail(item, item.originalIdx);
+            row.dataset.id = item.id || `temp-${index}`;
+            row.onclick = () => showDetail(item, index);
             
             const isStartTab = (currentTab === 'start');
             const isPocketTab = (currentTab === 'pockets');
             
             row.innerHTML = `
+                <div class="drag-handle"><i class="fa-solid fa-grip-vertical"></i></div>
                 <div class="time-box ${isStartTab || isPocketTab ? 'hidden' : ''}">${item.time || '--:--'}</div>
                 <div class="content-box">
                     <div class="item-name">${item.name}</div>
@@ -332,11 +341,47 @@
         });
 
         if (items.length === 0) {
-            list.innerHTML = `<div style="padding:20px 0; text-align:center; color:var(--text-gray); font-size:14px;">尚無資料</div>`;
+            list.innerHTML = `<div style="padding:40px 0; text-align:center; color:var(--text-gray); font-size:14px; opacity: 0.6;">尚無資料</div>`;
         }
 
         card.appendChild(list);
         area.appendChild(card);
+
+        // 初始化拖移功能
+        if (items.length > 0) {
+            initSortable(list);
+        }
+    }
+
+    function initSortable(el) {
+        if (sortableInstance) sortableInstance.destroy();
+        
+        // 如果是口袋名單且過濾了標籤，則禁用排序（避免邏輯混亂）
+        const isFilteredPocket = currentTab === 'pockets' && currentPocketFilter !== '全部';
+        
+        sortableInstance = new Sortable(el, {
+            animation: 150,
+            handle: '.drag-handle',
+            ghostClass: 'sortable-ghost',
+            disabled: isFilteredPocket,
+            onEnd: function (evt) {
+                const oldIndex = evt.oldIndex;
+                const newIndex = evt.newIndex;
+                if (oldIndex === newIndex) return;
+
+                if (currentTab === 'start') {
+                    const movedItem = userItinerary.start.splice(oldIndex, 1)[0];
+                    userItinerary.start.splice(newIndex, 0, movedItem);
+                } else if (currentTab === 'pockets') {
+                    const movedItem = userItinerary.pockets.splice(oldIndex, 1)[0];
+                    userItinerary.pockets.splice(newIndex, 0, movedItem);
+                } else {
+                    const movedItem = userItinerary.days[currentTab].splice(oldIndex, 1)[0];
+                    userItinerary.days[currentTab].splice(newIndex, 0, movedItem);
+                }
+                save();
+            }
+        });
     }
 
     function showDetail(item, actualIndex) {
@@ -450,10 +495,10 @@
             <button class="btn-action" style="background:none; color:var(--text-gray); margin-top:5px" onclick="closeModal()">取消</button>
         `;
 
-        document.getElementById('save-item-btn').onclick = () => saveEdit(index);
+        document.getElementById('save-item-btn').onclick = () => saveEdit(index, item.id);
     }
 
-    function saveEdit(index) {
+    function saveEdit(index, existingId) {
         const nameInput = document.getElementById('edit-name');
         if (!nameInput || !nameInput.value.trim()) {
             if (nameInput) nameInput.style.borderColor = 'var(--danger)';
@@ -461,6 +506,7 @@
         }
 
         const updated = {
+            id: existingId || Date.now().toString(),
             name: nameInput.value,
             time: document.getElementById('edit-time')?.value || '',
             emoji: document.getElementById('edit-emoji').value || '📍',
@@ -480,22 +526,18 @@
             } else {
                 if (!userItinerary.days[currentTab]) userItinerary.days[currentTab] = [];
                 userItinerary.days[currentTab].push(updated);
-                userItinerary.days[currentTab].sort((a,b) => (a.time || '00:00').localeCompare(b.time || '00:00'));
             }
         } else {
             if (currentTab === 'start') userItinerary.start[index] = updated;
             else if (currentTab === 'pockets') userItinerary.pockets[index] = updated;
-            else {
-                userItinerary.days[currentTab][index] = updated;
-                userItinerary.days[currentTab].sort((a,b) => (a.time || '00:00').localeCompare(b.time || '00:00'));
-            }
+            else userItinerary.days[currentTab][index] = updated;
         }
         save();
         closeModal();
     }
 
     function save() {
-        localStorage.setItem('korea_travel_v11', JSON.stringify(userItinerary));
+        localStorage.setItem('korea_travel_v12', JSON.stringify(userItinerary));
         render();
     }
 
