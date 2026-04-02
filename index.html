@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KOREA 🫧 - 旅遊助手</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --light-blue: #f0f4f8; 
+            --white: #FFFFFF;
+            --accent-blue: #5a7d9a; 
+            --accent-purple: #8e8da4; 
+            --accent-green: #8ca38a; /* 莫蘭迪綠 */
+            --text-dark: #334155; 
+            --text-gray: #708090; 
+            --danger: #b36b6b; 
+            --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            font-family: 'Noto Sans TC', 'Poppins', sans-serif;
+            background-color: var(--light-blue);
+            background-image: linear-gradient(135deg, #e2e8f0 0%, #f1f5f9 100%);
+            margin: 0; padding: 0; min-height: 100vh;
+            color: var(--text-dark); overflow-x: hidden;
+        }
+
+        .container { max-width: 480px; margin: 0 auto; padding: 20px 20px 100px 20px; }
+
+        header { text-align: center; margin-bottom: 25px; padding-top: 20px; }
+        header h1 { font-size: 32px; font-weight: 700; color: var(--accent-blue); margin: 0; letter-spacing: 2px; }
+        header p { font-size: 14px; font-weight: 600; color: var(--text-gray); letter-spacing: 1px; margin-top: 5px; opacity: 0.8; }
+
+        /* 導覽列：7 格 */
+        .nav-scroller {
+            background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(12px);
+            border-radius: 25px; padding: 4px; 
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            position: sticky; top: 15px; z-index: 100;
+            box-shadow: var(--card-shadow); margin-bottom: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .nav-btn {
+            border: none; background: none; padding: 12px 0;
+            font-size: 13px; font-weight: 700; color: var(--text-gray);
+            border-radius: 20px; cursor: pointer; transition: all 0.3s ease;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        /* 選取狀態顏色統一為莫蘭迪綠 */
+        .nav-btn.active { 
+            background: var(--accent-green); 
+            color: var(--white); 
+            box-shadow: 0 4px 12px rgba(140, 163, 138, 0.3); 
+        }
+        
+        .btn-pocket { font-size: 18px; }
+
+        .card {
+            background: rgba(255, 255, 255, 0.85); border-radius: 24px; padding: 20px;
+            box-shadow: var(--card-shadow); margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .section-title { font-size: 16px; font-weight: 700; color: var(--accent-blue); margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+
+        .filter-tags { display: flex; gap: 8px; overflow-x: auto; margin-bottom: 20px; padding-bottom: 5px; scrollbar-width: none; }
+        .filter-tags::-webkit-scrollbar { display: none; }
+        
+        .tag-pill {
+            flex: 0 0 auto; padding: 6px 14px; border-radius: 20px; background: #e2e8f0;
+            color: var(--text-gray); font-size: 12px; font-weight: 600; cursor: pointer; border: 1px solid #cbd5e1;
+        }
+        .tag-pill.active { background: var(--accent-purple); color: white; border-color: var(--accent-purple); }
+
+        .item-list { display: flex; flex-direction: column; gap: 12px; }
+
+        .item-row {
+            background: rgba(248, 250, 252, 0.6); border-radius: 18px; padding: 15px;
+            display: flex; align-items: center; gap: 12px; cursor: pointer;
+            transition: all 0.2s ease; border: 1px solid rgba(226, 232, 240, 0.8);
+        }
+
+        .item-row:active { transform: scale(0.98); background: #e2e8f0; }
+
+        .time-box { width: 50px; text-align: center; font-size: 12px; font-weight: 800; color: var(--accent-blue); }
+        .time-box.hidden { display: none; }
+        
+        .content-box { flex: 1; }
+        .item-name { font-size: 14px; font-weight: 700; margin-bottom: 4px; color: var(--text-dark); }
+        .item-meta { font-size: 10px; color: var(--text-gray); display: flex; flex-wrap: wrap; gap: 6px; }
+        
+        .meta-tag { background: #cbd5e1; color: #475569; padding: 2px 6px; border-radius: 6px; font-weight: 500; }
+        .meta-tag.tag-area { background: #d1d5db; color: #374151; }
+
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(51, 65, 85, 0.6);
+            backdrop-filter: blur(6px); display: none; z-index: 1000;
+            align-items: center; justify-content: center; padding: 20px;
+        }
+
+        .modal {
+            background: var(--white); width: 100%; max-width: 420px;
+            border-radius: 32px; padding: 25px; position: relative;
+            max-height: 85vh; overflow-y: auto;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            animation: modalPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes modalPop { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+        .modal-close { position: absolute; top: 20px; right: 20px; font-size: 24px; color: var(--text-gray); cursor: pointer; }
+
+        .btn-naver {
+            display: block; width: 100%; background: #607d8b; color: white;
+            text-align: center; padding: 14px; border-radius: 16px;
+            text-decoration: none; font-weight: 700; margin-top: 15px; border: none; cursor: pointer;
+        }
+
+        .btn-action {
+            width: 100%; border: none; padding: 12px; border-radius: 12px;
+            font-weight: bold; cursor: pointer; margin-top: 10px; font-family: inherit;
+        }
+
+        .fab-group {
+            position: fixed; bottom: 30px; right: 25px; 
+            display: flex; flex-direction: column; gap: 15px;
+            z-index: 200;
+        }
+
+        .btn-fab {
+            width: 60px; height: 60px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 24px; box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            cursor: pointer; border: none; transition: transform 0.2s ease;
+            text-decoration: none;
+        }
+
+        .btn-exchange { background: var(--accent-green); color: white; font-weight: 700; font-size: 26px; }
+        .btn-add { background: var(--accent-blue); color: white; }
+
+        .form-group { margin-bottom: 12px; }
+        .form-group label { display: block; font-size: 11px; font-weight: 700; color: var(--text-gray); margin-bottom: 4px; }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%; padding: 10px; border-radius: 10px; border: 1px solid #cbd5e1; outline: none; font-family: inherit; font-size: 14px; background: #f8fafc;
+        }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>KOREA 🫧</h1>
+        <p>2026.04.25-04.29</p>
+    </header>
+
+    <nav class="nav-scroller" id="main-nav">
+        <button class="nav-btn active" data-tab="start">行前</button>
+        <button class="nav-btn" data-tab="1">D1</button>
+        <button class="nav-btn" data-tab="2">D2</button>
+        <button class="nav-btn" data-tab="3">D3</button>
+        <button class="nav-btn" data-tab="4">D4</button>
+        <button class="nav-btn" data-tab="5">D5</button>
+        <button class="nav-btn btn-pocket" data-tab="pockets">🩶</button>
+    </nav>
+
+    <div id="content-area"></div>
+</div>
+
+<div class="fab-group">
+    <a href="https://xxx910616.github.io/Exchange-rate-calculator/" target="_blank" class="btn-fab btn-exchange" title="匯率換算">$</a>
+    <button class="btn-fab btn-add" id="open-add-btn" title="新增項目"><i class="fa-solid fa-plus"></i></button>
+</div>
+
+<div class="modal-overlay" id="modal-container">
+    <div class="modal" id="modal-content"></div>
+</div>
+
+<script>
+    const pocketTags = ['全部', '聖水洞', '廣藏市場', '弘大', '明洞', '東大門'];
+
+    const baseData = {
+        start: [
+            { id: 'p1', name: '🔌 自備插座轉接頭', detail: '圓形 4.8mm 雙孔', emoji: '🔌' },
+            { id: 'p2', name: '💰 在台灣換 20 萬韓幣', detail: '另備台幣備用', emoji: '💰' },
+            { id: 'p3', name: '💳 刷卡手續費 1.5%', detail: '滿 ₩15000 可退稅', emoji: '💳' },
+            { id: 'p4', name: '👘 藝人韓服 ✅', detail: '預約 TWD 245/人', emoji: '👘', address: '서울 종로구 자하문로1가길 5 . 3층' },
+            { id: 'p5', name: '🎢 愛寶樂園門票 ✅', detail: '預約 TWD 705/人', emoji: '🎢' },
+            { id: 'p6', name: '📱 ESIM (5天10G)', detail: '$279/人', emoji: '📱' },
+            { id: 'p7', name: '🏨 Aank Hotel Yeondengpo', detail: '서울 영등포구 영중로10길 10', emoji: '🏨', address: '서울 영등포구 영중로10길 10' }
+        ],
+        days: {
+            1: [
+                { time: '21:35', name: '抵達仁川 🛬', address: 'ICN Airport', transport: '17:55-21:35', emoji: '🛫' },
+                { time: '22:30', name: '飯店 Check-in', address: '서울 영등포구 영중로10길 10', transport: '機場接送', money: '₩13000/人', emoji: '🏨' },
+                { time: '23:30', name: '東大門批發 (The mask shop / APM / Nyunyu)', address: '서울 중구 퇴계로73길 36 1層', transport: '公車 / UBER', emoji: '🛍️', area: '東大門' },
+                { time: '01:00', name: '🥩 大成精肉店 대성정육식당', address: '서울 용산구 서빙고로95길 22', transport: 'UBER', money: '₩20000/人', emoji: '🥩' },
+                { time: '02:30', name: '回飯店休息', address: '서울 영등포구 영중로10길 10', transport: 'UBER / 夜間公車', emoji: '🛌' }
+            ],
+            2: [
+                { time: '09:00', name: '景福宮 경복궁', address: '서울특별시 종로구 사직로 161', transport: '地鐵 5 號線', emoji: '🏛️' },
+                { time: '10:00', name: '藝人韓服預約 ✅', address: '서울 종로구 자하문로1가길 5 . 3층', transport: '🚶🏻‍➡️ 步行', money: 'TWD 245', emoji: '👘' },
+                { time: '11:30', name: 'Olive Better', emoji: '💄' },
+                { time: '12:30', name: '🦀 順美家幸福的醬蟹 순미네행복게장', address: '서울 中區 乙支路43街 38 2層', transport: '地鐵 / 🚶🏻‍➡️', emoji: '🦀', area: '東大門' },
+                { time: '14:00', name: '🐔 孔陵一隻雞 공陵닭한마리', address: '서울 종羅區 종로40가길 20', transport: '🚶🏻‍➡️ 步行', emoji: '🍗' },
+                { time: '15:30', name: '廣藏市場 광장시장', address: '서울특별시 종로구 창經宮路 88', transport: '🚶🏻‍➡️ 步行', emoji: '🍢', area: '廣藏市場' },
+                { time: '16:30', name: '明洞 + 樂天百貨', emoji: '🏙️', area: '明洞' },
+                { time: '18:30', name: '首爾車站樂天超市', address: '서울 中區 漢江大路 405', emoji: '🛒' },
+                { time: '20:00', name: '🥩 明倫進士燒烤', address: '서울 영등포구 영중로10길 20', money: '₩21900/人', emoji: '🥩' },
+                { time: '21:30', name: '飯店休息', emoji: '🛌' }
+            ],
+            3: [
+                { time: '10:00', name: '出發漢南洞', transport: '地鐵 5 轉 6 號線', emoji: '🚇' },
+                { time: '12:00', name: '🐷 安木豬肉湯飯 안목 성수국밥', address: '서울 성동구 뚝섬로13길 34 1層', money: '₩13000/人', emoji: '🐷', area: '聖水洞' },
+                { time: '13:30', name: '聖水洞逛街', address: '서울 성동구 연무장11길 19', emoji: '☕', area: '聖水洞' },
+                { time: '15:00', name: 'MAMAN GELATO', emoji: '🍦', area: '聖水洞' },
+                { time: '16:00', name: 'Milky Shop 밀키샵', emoji: '🍩', area: '聖水洞' },
+                { time: '18:00', name: '🍜 JOJO 刀削麵 조조칼국수', address: '서울 성동구 성수일로8길 55', money: '₩10000/人', emoji: '🍜', area: '聖水洞' },
+                { time: '20:00', name: '回飯店', emoji: '🏨' }
+            ],
+            4: [
+                { time: '09:00', name: '專車出發 🎢', transport: '預約專車', emoji: '🚐' },
+                { time: '10:00', name: '愛寶樂園 에버랜드', address: '경기도 용인시 처인구 포곡읍 에버랜드로 199', emoji: '🎢' },
+                { time: '16:00', name: '醫美行程 (弘大)', emoji: '🏥', area: '弘大' },
+                { time: '18:00', name: '🐙 Hongs Zzuggumi 辣炒章魚', money: '₩16000/人', emoji: '🐙', area: '弘大' },
+                { time: '19:30', name: '望遠碼頭搭船 (往汝矣島)', emoji: '🚢' },
+                { time: '22:30', name: 'GOP 곱牛腸 文來本底', money: '₩11500/人起', emoji: '🥘' }
+            ],
+            5: [
+                { time: '10:30', name: '出發往機場 🛫', emoji: '✈️' },
+                { time: '14:45', name: '搭機返台', emoji: '🇹🇼' }
+            ]
+        },
+        pockets: [
+             { name: 'Dior 聖水', area: '聖水洞', emoji: '👜', address: '서울 성동구 연무장5길 7' }
+        ] 
+    };
+
+    let userItinerary = JSON.parse(localStorage.getItem('korea_travel_v11')) || baseData;
+    let currentTab = 'start';
+    let currentPocketFilter = '全部';
+
+    function render() {
+        const area = document.getElementById('content-area');
+        area.innerHTML = '';
+        const card = document.createElement('div');
+        card.className = 'card';
+        
+        let titleHtml = '';
+        if (currentTab === 'start') titleHtml = '<i class="fa-solid fa-clipboard-check"></i> 行前備忘與預約';
+        else if (currentTab === 'pockets') titleHtml = '<i class="fa-solid fa-heart" style="color:var(--accent-purple)"></i> 我的口袋名單';
+        else titleHtml = `<i class="fa-solid fa-calendar-day"></i> Day ${currentTab} 行程表`;
+
+        card.innerHTML = `<div class="section-title">${titleHtml}</div>`;
+
+        if (currentTab === 'pockets') {
+            const filterDiv = document.createElement('div');
+            filterDiv.className = 'filter-tags';
+            pocketTags.forEach(tag => {
+                const span = document.createElement('span');
+                span.className = `tag-pill ${currentPocketFilter === tag ? 'active' : ''}`;
+                span.innerText = tag;
+                span.onclick = () => { currentPocketFilter = tag; render(); };
+                filterDiv.appendChild(span);
+            });
+            card.appendChild(filterDiv);
+        }
+
+        const list = document.createElement('div');
+        list.className = 'item-list';
+        
+        let items = [];
+        if (currentTab === 'start') items = userItinerary.start;
+        else if (currentTab === 'pockets') {
+            items = currentPocketFilter === '全部' ? userItinerary.pockets : userItinerary.pockets.filter(i => i.area === currentPocketFilter);
+        } else {
+            items = userItinerary.days[currentTab] || [];
+        }
+
+        items.forEach((item, index) => {
+            const row = document.createElement('div');
+            row.className = 'item-row';
+            row.onclick = () => showDetail(item, index);
+            const isPocketsOrStart = (currentTab === 'start' || currentTab === 'pockets');
+            
+            row.innerHTML = `
+                <div class="time-box ${isPocketsOrStart ? 'hidden' : ''}">${item.time || '--:--'}</div>
+                <div class="content-box">
+                    <div class="item-name">${item.name}</div>
+                    <div class="item-meta">
+                        ${item.area ? `<span class="meta-tag tag-area"><i class="fa-solid fa-location-dot"></i> ${item.area}</span>` : ''}
+                        ${item.transport ? `<span class="meta-tag"><i class="fa-solid fa-bus"></i> ${item.transport}</span>` : ''}
+                        ${item.money ? `<span class="meta-tag"><i class="fa-solid fa-won-sign"></i> ${item.money}</span>` : ''}
+                    </div>
+                </div>
+                <div class="emoji-box" style="font-size:20px">${item.emoji || '📍'}</div>
+            `;
+            list.appendChild(row);
+        });
+
+        if (items.length === 0 && currentTab === 'pockets') {
+            list.innerHTML = `<div style="text-align:center; padding:30px 0; color:var(--text-gray); font-size:13px">尚未加入收藏，點擊 + 號新增！</div>`;
+        }
+
+        card.appendChild(list);
+        area.appendChild(card);
+    }
+
+    function showDetail(item, index) {
+        const modal = document.getElementById('modal-container');
+        const content = document.getElementById('modal-content');
+        const naverUrl = item.address ? `https://map.naver.com/v5/search/${encodeURIComponent(item.address)}` : null;
+
+        content.innerHTML = `
+            <span class="modal-close" onclick="closeModal()">&times;</span>
+            <div style="text-align:center; margin-bottom:15px">
+                <div style="font-size:48px">${item.emoji || '📍'}</div>
+                <h2 style="color:var(--accent-blue)">${item.name}</h2>
+            </div>
+            <div style="font-size:14px; background:#f1f5f9; padding:15px; border-radius:15px">
+                ${item.area ? `<b>🏙️ 區域：</b> ${item.area}<br>` : ''}
+                ${item.transport ? `<b>🚍 交通：</b> ${item.transport}<br>` : ''}
+                ${item.money ? `<b>💰 預算：</b> ${item.money}<br>` : ''}
+                ${item.detail ? `<b>ℹ️ 備註：</b> ${item.detail}<br>` : ''}
+                ${item.address ? `<b>📍 地址：</b><br><span style="font-size:12px">${item.address}</span>` : ''}
+            </div>
+            ${naverUrl ? `<a href="${naverUrl}" target="_blank" class="btn-naver">開啟 NAVER 地圖</a>` : ''}
+            <div style="display:flex; gap:10px; margin-top:10px">
+                <button class="btn-action" style="flex:1; background:var(--light-blue); color:var(--accent-blue)" onclick='showEditForm(${JSON.stringify(item).replace(/'/g, "&apos;")}, ${index})'>編輯</button>
+                <button class="btn-action" style="flex:1; background:#fecaca; color:var(--danger)" onclick="deleteItem(${index})">刪除</button>
+            </div>
+        `;
+        modal.style.display = 'flex';
+    }
+
+    function showEditForm(item, index) {
+        const content = document.getElementById('modal-content');
+        content.innerHTML = `
+            <span class="modal-close" onclick="closeModal()">&times;</span>
+            <h3 style="margin-bottom:15px; color:var(--accent-blue)">編輯 / 新增項目</h3>
+            <div class="form-group"><label>名稱</label><input type="text" id="edit-name" value="${item.name || ''}"></div>
+            <div class="form-group"><label>區域</label><select id="edit-area">${pocketTags.map(t => `<option value="${t==='全部'?'':t}" ${item.area===t?'selected':''}>${t}</option>`).join('')}</select></div>
+            <div class="form-group"><label>時間</label><input type="text" id="edit-time" value="${item.time || ''}"></div>
+            <div class="form-group"><label>Emoji</label><input type="text" id="edit-emoji" value="${item.emoji || '📍'}"></div>
+            <div class="form-group"><label>地址</label><input type="text" id="edit-address" value="${item.address || ''}"></div>
+            <div class="form-group"><label>交通 / 預算 / 備註</label><textarea id="edit-detail">${item.detail || ''}</textarea></div>
+            <button class="btn-naver" style="background:var(--accent-green)" onclick="saveEdit(${index})">儲存項目</button>
+        `;
+    }
+
+    function saveEdit(index) {
+        const updated = {
+            name: document.getElementById('edit-name').value,
+            time: document.getElementById('edit-time').value,
+            emoji: document.getElementById('edit-emoji').value,
+            address: document.getElementById('edit-address').value,
+            detail: document.getElementById('edit-detail').value,
+            area: document.getElementById('edit-area').value
+        };
+        if(index === -1) {
+            if(currentTab === 'pockets') userItinerary.pockets.push(updated);
+            else if(currentTab === 'start') userItinerary.start.push(updated);
+            else userItinerary.days[currentTab].push(updated);
+        } else {
+            if(currentTab === 'start') userItinerary.start[index] = updated;
+            else if(currentTab === 'pockets') userItinerary.pockets[index] = updated;
+            else userItinerary.days[currentTab][index] = updated;
+        }
+        save(); closeModal();
+    }
+
+    function deleteItem(index) {
+        if(confirm('確定要刪除嗎？')) {
+            if(currentTab === 'start') userItinerary.start.splice(index, 1);
+            else if(currentTab === 'pockets') userItinerary.pockets.splice(index, 1);
+            else userItinerary.days[currentTab].splice(index, 1);
+            save(); closeModal();
+        }
+    }
+
+    function save() {
+        localStorage.setItem('korea_travel_v11', JSON.stringify(userItinerary));
+        render();
+    }
+
+    function closeModal() { document.getElementById('modal-container').style.display = 'none'; }
+
+    document.getElementById('main-nav').addEventListener('click', (e) => {
+        const btn = e.target.closest('.nav-btn');
+        if (!btn) return;
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentTab = btn.dataset.tab;
+        render();
+    });
+
+    document.getElementById('open-add-btn').onclick = () => {
+        showEditForm({name:'', emoji:'📍'}, -1);
+        document.getElementById('modal-container').style.display = 'flex';
+    };
+
+    window.onclick = (e) => { if(e.target.id === 'modal-container') closeModal(); };
+    window.onload = render;
+</script>
+</body>
+</html>
