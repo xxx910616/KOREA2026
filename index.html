@@ -11,7 +11,7 @@
     <style>
         :root {
             --light-blue: #f0f4f8;
-            --soft-yellow: #fef9c3; /* 淺黃色 */
+            --soft-yellow: #fef9c3;
             --white: #FFFFFF;
             --accent-blue: #5a7d9a;
             --accent-purple: #8e8da4;
@@ -106,6 +106,7 @@
         
         .content-box { flex: 1; }
         .item-name { font-size: 14px; font-weight: 700; margin-bottom: 4px; color: var(--text-dark); line-height: 1.4; }
+        .item-desc { font-size: 11px; color: var(--text-gray); margin-bottom: 4px; } /* 行前備註樣式 */
         .item-meta { font-size: 10px; color: var(--text-gray); display: flex; flex-wrap: wrap; gap: 6px; }
         
         .meta-tag { background: #cbd5e1; color: #475569; padding: 2px 6px; border-radius: 6px; font-weight: 500; display: inline-flex; align-items: center; gap: 3px; }
@@ -166,7 +167,6 @@
         }
         .hidden { display: none !important; }
 
-        /* 確認刪除的專用樣式 */
         .confirm-dialog { text-align: center; padding: 10px 5px; }
         .confirm-title { font-size: 18px; font-weight: 700; color: var(--danger); margin-bottom: 10px; }
         .confirm-btns { display: flex; gap: 10px; margin-top: 25px; }
@@ -205,7 +205,6 @@
 </div>
 
 <script>
-    // 更新標籤名單：廣藏市場 -> 廣藏
     const pocketTags = ['全部', '聖水洞', '廣藏', '弘大', '明洞', '東大門', '漢南洞'];
 
     const defaultData = {
@@ -230,7 +229,7 @@
                 { time: '09:00', name: '景福宮 경복궁', address: '서울특별시 종羅구 사직로 161', transport: '地鐵 5 號線', emoji: '🏛️' },
                 { time: '10:00', name: '藝人韓服預約 ✅', address: '서울 종羅區 자하문로1가길 5 . 3層', transport: '🚶🏻‍➡️ 步行', money: 'TWD 245', emoji: '👘' },
                 { time: '12:30', name: '🦀 順美家幸福的醬蟹 순미네행복게장', address: '서울 中區 乙支路43街 38 2層', transport: '地鐵 / 🚶🏻‍➡️', emoji: '🦀', area: '東大門' },
-                { time: '14:00', name: '🐔 孔陵一隻雞 공陵닭한마리', address: '서울 종羅區 종로40가길 20', transport: '🚶🏻‍➡️ 步行', emoji: '🍗' },
+                { time: '14:00', name: '🐔 孔陵一隻雞 공陵닭한마리', address: '서울 종羅區 종羅40가길 20', transport: '🚶🏻‍➡️ 步行', emoji: '🍗' },
                 { time: '15:30', name: '廣藏市場 🍢', address: '서울특별시 종로구 창경궁로 88', transport: '🚶🏻‍➡️ 步行', emoji: '🍢', area: '廣藏' },
                 { time: '16:30', name: '明洞 + 樂天百貨', address: '서울특별시 중구 명動2家', transport: '地鐵 / 公車', emoji: '🏙️', area: '明洞' },
                 { time: '18:30', name: '首爾車站樂天超市', address: '서울 中區 漢江大路 405', transport: '地鐵 / 公車', emoji: '🛒' },
@@ -312,16 +311,19 @@
             row.className = 'item-row';
             row.onclick = () => showDetail(item, item.originalIdx);
             
-            const hideTime = (currentTab === 'start' || currentTab === 'pockets');
+            const isStartTab = (currentTab === 'start');
+            const isPocketTab = (currentTab === 'pockets');
             
             row.innerHTML = `
-                <div class="time-box ${hideTime ? 'hidden' : ''}">${item.time || '--:--'}</div>
+                <div class="time-box ${isStartTab || isPocketTab ? 'hidden' : ''}">${item.time || '--:--'}</div>
                 <div class="content-box">
                     <div class="item-name">${item.name}</div>
+                    ${isStartTab && item.detail ? `<div class="item-desc">${item.detail}</div>` : ''}
                     <div class="item-meta">
                         ${item.area ? `<span class="meta-tag tag-area"><i class="fa-solid fa-location-dot"></i> ${item.area}</span>` : ''}
                         ${item.transport ? `<span class="meta-tag"><i class="fa-solid fa-bus"></i> ${item.transport}</span>` : ''}
                         ${item.money ? `<span class="meta-tag"><i class="fa-solid fa-won-sign"></i> ${item.money}</span>` : ''}
+                        ${!isStartTab && item.detail ? `<span class="meta-tag"><i class="fa-solid fa-note-sticky"></i> 備註</span>` : ''}
                     </div>
                 </div>
                 <div class="emoji-box" style="font-size:20px">${item.emoji || '📍'}</div>
@@ -330,7 +332,7 @@
         });
 
         if (items.length === 0) {
-            list.innerHTML = `<div style="padding:20px 0;"></div>`;
+            list.innerHTML = `<div style="padding:20px 0; text-align:center; color:var(--text-gray); font-size:14px;">尚無資料</div>`;
         }
 
         card.appendChild(list);
