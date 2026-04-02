@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>KOREA 🫧 - 2026 旅遊助手</title>
+    <title> KOREA🫧</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
@@ -192,7 +192,7 @@
 
 <div class="container">
     <header>
-        <h1>KOREA 🫧</h1>
+        <h1> 🫧</h1>
         <p>2026.04.25 - 04.29</p>
     </header>
 
@@ -270,7 +270,7 @@
         pockets: [] 
     };
 
-    let userItinerary = JSON.parse(localStorage.getItem('korea_travel_v12')) || defaultData;
+    let userItinerary = JSON.parse(localStorage.getItem('_travel_v12')) || defaultData;
     let currentTab = 'start';
     let currentPocketFilter = '全部';
     let sortableInstance = null;
@@ -535,7 +535,7 @@
     }
 
     function save() {
-        localStorage.setItem('korea_travel_v12', JSON.stringify(userItinerary));
+        localStorage.setItem('_travel_v12', JSON.stringify(userItinerary));
         render();
     }
 
