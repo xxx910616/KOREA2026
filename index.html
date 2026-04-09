@@ -179,7 +179,7 @@
     </header>
 
     <nav class="nav-scroller" id="main-nav">
-        <button class="nav-btn active" data-tab="start">行前</button>
+        <button class="nav-btn active" data-tab="start">行前準備</button>
         <button class="nav-btn" data-tab="1">D1</button>
         <button class="nav-btn" data-tab="2">D2</button>
         <button class="nav-btn" data-tab="3">D3</button>
@@ -237,47 +237,48 @@
     const initialData = {
         start: [
             { id: 's1', name: '自備插座轉接頭', detail: '圓形 4.8mm 雙孔', emoji: '🔌' },
-            { id: 's2', name: '換韓幣', detail: '在台灣換 20 萬韓幣，另備台幣備用', emoji: '💰' },
+            { id: 's2', name: '換韓幣', detail: '在台灣換 10 萬韓幣，另備5千-1萬台幣備用', emoji: '💰' },
             { id: 's3', name: '刷卡須知', detail: '手續費 1.5%，滿 ₩30000 可退稅', emoji: '💳' },
             { id: 's4', name: '藝人韓服', detail: '預約 TWD 245/人', emoji: '👘' },
             { id: 's5', name: '愛寶樂園門票', detail: '預約 TWD 705/人', emoji: '🎢' },
-            { id: 's6', name: 'ESIM (5天10G)', detail: '$279/人', emoji: '📱' },
-            { id: 's7', name: '飯店: Aank Hotel', address: '서울 영등포구 영중로10길 10', emoji: '🏨' }
+            { id: 's6', name: 'ESIM 自備', detail: '$279/人', emoji: '📱' },
+            { id: 's7', name: '飯店 Aank Hotel Yeongdengpo branch', address: '서울 영등포구 영중로10길 10', emoji: '🏨' }
         ],
         days: {
             1: [
                 { id: 'd1-1', time: '21:35', name: '抵達仁川', emoji: '🛫', detail: '辦理出關' },
                 { id: 'd1-2', time: '22:30', name: '飯店 Check-in', emoji: '🏨', transport: '機場接送', money: '₩13000/人' },
                 { id: 'd1-3', time: '23:00', name: 'Oliveyoung Dootamall', emoji: '🪞', address: '서울 중구 장충단로 275 두산타워 B2층', transport: '夜間公車/UBER' },
-                { id: 'd1-4', time: '00:00', name: '東大門', emoji: '🛍️', address: '서울 중구 퇴계로73길 36 1층', transport: '夜間公車/UBER' },
+                { id: 'd1-4', time: '00:00', name: 'The mask shop', emoji: '🛍️', address: '서울 중구 퇴계로73길 36 1층', transport: '夜間公車/UBER' },
                 { id: 'd1-5', time: '01:00', name: '大成精肉店 대성정육식당', emoji: '🥩', address: '서울 용산구 보광동 63-2', transport: '夜間公車/UBER' },
-                { id: 'd1-6', time: '02:30', name: '回飯店休息', emoji: '😴' }
+                { id: 'd1-6', time: '02:30', name: '飯店', emoji: '🏨' transport: '夜間公車/UBER' },
             ],
             2: [
-                { id: 'd2-1', time: '09:00', name: '景福宮 경복궁', emoji: '🏛️', address: '서울 종로구 세종로 1-1', transport: '地鐵5+3' },
-                { id: 'd2-2', time: '10:00', name: '藝人韓服 연예인 한복', emoji: '👘', address: '서울 종로구 체부동 60-2', transport: '🚶🏻‍➡️' },
+                { id: 'd2-1', time: '09:00', name: '藝人韓服 연예인 한복', emoji: '👘', address: '서울 종로구 체부동 60-2', transport: '地鐵1+3' },
+                { id: 'd2-2', time: '10:00', name: '景福宮 경복궁', emoji: '🏛️', address: '서울 종로구 세종로 1-1', transport: '🚶🏻‍➡️' },
                 { id: 'd2-3', time: '11:30', name: 'Olive Better', emoji: '🍒', address: '서울 종로구 청진동 246', transport: '🚶🏻‍➡️' },
                 { id: 'd2-4', time: '12:30', name: '順美家幸福的醬蟹 순미네행복게장 동大門', emoji: '🦀', address: '서울 중구 을지로6가 18-37', transport: '地鐵3+2' },
                 { id: 'd2-5', time: '15:30', name: '廣藏市場 광장시장', emoji: '🍢', address: '서울 종로구 예지동 2-1', transport: '🚶🏻‍➡️' },
                 { id: 'd2-6', time: '16:30', name: '明洞', emoji: '🏙️', address: '서울 중구 소공동 1', transport: '地鐵1+4' },
-                { id: 'd2-7', time: '16:00', name: '明洞樂天百貨 롯데백화점 본점', emoji: '🛍️', address: '서울 中區 小公洞 1', transport: '🚶🏻‍➡️' },
-                { id: 'd2-8', time: '18:30', name: '樂天超市 롯데마트 서울역점', emoji: '🛒', address: '서울특별시 중구 청파로 426', transport: '地鐵4' },
-                { id: 'd2-9', time: '20:00', name: '明倫進士燒烤 명륜진사갈비 영등포역점', emoji: '🥩', address: '서울 영등포구 영등포동3가 16-2', transport: '🚶🏻‍➡️' }
+                { id: 'd2-7', time: '18:30', name: '樂天超市 롯데마트 서울역점', emoji: '🛒', address: '서울특별시 중구 청파로 426', transport: '地鐵4' },
+                { id: 'd2-8', time: '20:00', name: '明倫進士燒烤 명륜진사갈비 영등포역점', emoji: '🥩', address: '서울 영등포구 영등포동3가 16-2', transport: '🚶🏻‍➡️' }
+                { id: 'd2-9', time: '20:00', name: '飯店', emoji: '🏨' transport: '🚶🏻‍➡️' }
             ],
             3: [
-                { id: 'd3-1', time: '10:00', name: '漢南洞 한남동', emoji: '🚇', address: '서울 용산구 한남동', transport: '地鐵5+6' },
-                { id: 'd3-2', time: '12:00', name: '安木豬肉湯飯 성수', emoji: '🐷', address: '서울 성동구 뚝섬로13길 34 1층', transport: '地鐵6+2' },
-                { id: 'd3-3', time: '13:30', name: '聖水洞 성수동', emoji: '☕', address: '서울 성동구 성수동', transport: '🚶🏻‍➡️' },
-                { id: 'd3-4', time: '18:00', name: 'JOJO刀削麵', emoji: '🍜', address: '서울 성동구 성수동2가 289-257', transport: '🚶🏻‍➡️' },
-                { id: 'd3-5', time: '21:00', name: '回飯店', emoji: '🏨', transport: '地鐵2+5' }
+                { id: 'd3-1', time: '10:00', name: '安木豬肉湯飯 성수', emoji: '🐷', address: '서울 성동구 뚝섬로13길 34 1층', transport: '地鐵1+2' },
+                { id: 'd3-2', time: '12:00', name: '聖水洞 성수동', emoji: '☕', address: '서울 성동구 성수동', transport: '🚶🏻‍➡️' },
+                { id: 'd3-3', time: '15:00', name: 'JOJO刀削麵', emoji: '🍜', address: '서울 성동구 성수동2가 289-257', transport: '🚶🏻‍➡️' },
+                { id: 'd3-4', time: '18:00', name: '漢南洞 한남동', emoji: '🚇', address: '서울 용산구 한남동', transport: '地鐵2+6' },
+                { id: 'd3-4', time: '20:00', name: 'GOP牛腸강남곱', emoji: '🥘', address: '서울 강남구 역삼로3길 12', transport: '公車/UBER' },
+                { id: 'd3-5', time: '22:00', name: '飯店', emoji: '🏨', transport: '地鐵6+5' }
             ],
             4: [
-                { id: 'd4-1', time: '10:00', name: '愛寶樂園 에버랜드', emoji: '🎢', address: '경기도 용인시 처인구 포곡읍 에버랜드로 199', transport: '專車' },
-                { id: 'd4-2', time: '16:00', name: '醫美行程 (弘大)', emoji: '🏥', transport: '專車' },
-                { id: 'd4-3', time: '18:00', name: 'Hongs Zzuggumi 辣炒章魚', emoji: '🐙', transport: '專車' },
-                { id: 'd4-4', time: '19:00', name: '望遠碼頭搭船遊漢江', emoji: '🚢', address: '서울 마포구 마포나루길 442', transport: '專車' },
-                { id: 'd4-5', time: '21:00', name: '汝矣島No Brand 노브랜드 영등포여의도점', emoji: '🏪', address: '서울 영등포구 여의도동 17-3', transport: '公車/UBER' },
-                { id: 'd4-6', time: '22:30', name: 'GOP牛腸강남곱', emoji: '🥘', address: '서울 강남구 역삼로3길 12', transport: '公車/UBER' }
+                { id: 'd4-1', time: '09:00', name: '愛寶樂園 에버랜드', emoji: '🎢', address: '경기도 용인시 처인구 포곡읍 에버랜드로 199', transport: '專車' },
+                { id: 'd4-2', time: '15:00', name: '醫美行程 (弘大)', emoji: '🏥', transport: '專車' },
+                { id: 'd4-3', time: '17:00', name: '望遠>汝矣島 漢江夜景', emoji: '🚢', address: '서울 마포구 마포나루길 442', transport: '🚢' },
+                { id: 'd4-4', time: '18:30', name: '汝矣島No Brand 노브랜드 영등포여의도점', emoji: '🏪', address: '서울 영등포구 여의도동 17-3', transport: '🚶🏻‍➡️' },
+                { id: 'd4-5', time: '19:30', name: '二高家的小章魚 이고집쭈꾸미본점', emoji: '🐙', address: '서울 영등포구 영등포동3가 11-11, transport: '公車/UBER' },
+                { id: 'd4-6', time: '20:30', name: '飯店', emoji: '🏨', transport: '🚶🏻‍➡️' }
             ],
             5: [
                 { id: 'd5-1', time: '10:30', name: '出發往機場', emoji: '🛫', transport: '巴士/機場接送', detail: '準備返台' },
@@ -285,7 +286,7 @@
             ]
         },
         heart: [
-            { id: 'h1', name: '聖水洞咖啡廳', detail: '熱門打卡點', emoji: '☕', address: '성수동' },
+            { id: 'h1', name: '聖水洞ONGO 온고', emoji: '👒', address: '서울 성동구 성수동2가 301-64' },
             { id: 'h2', name: '弘大延南洞', detail: '文青散步', emoji: '🌳', address: '연남동' }
         ]
     };
