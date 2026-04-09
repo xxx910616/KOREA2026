@@ -286,8 +286,15 @@
             ]
         },
         heart: [
-            { id: 'h1', name: '聖水洞ONGO 온고', emoji: '👒', address: '서울 성동구 성수동2가 301-64' },
-            { id: 'h2', name: '弘大延南洞', detail: '文青散步', emoji: '🌳', address: '연남동' }
+            { id: 'h1', name: '聖水洞 ONGO 온고', emoji: '👒', address: '서울 성동구 성수동2가 301-64' },
+            { id: 'h2', name: '聖水洞 CU甜點公園 성수디저트파크점', emoji: '🌳', address: '연남동' },
+            { id: 'h3', name: '聖水洞 MAMAN GELATO 마망젤라또 성수점', emoji: '🍦', address: '서울 성동구 성수동2가 315-18' },
+            { id: 'h4', name: '聖水洞 Milky Shop 밀키샵 성수점', emoji: '🍪', address: '서울 성동구 성수동2가 301-52' },
+            { id: 'h5', name: '明洞 FRESH BREAD FACTORY 갓구운빵공장 명동2호점', emoji: '🥐', address: '서울 중구 명동1가 34-1' },
+            { id: 'h6', name: '明洞 烤起司年糕', emoji: '🧀', address: '서울 중구 명동1가 61-2' },
+            { id: 'h7', name: '明洞 大創旗艦店 명동역점', emoji: '📃', address: ' 서울중구퇴계로134-1' },
+            { id: 'h8', name: '明洞 明朗熱狗 명랑핫도그 명동중앙우체국점', emoji: '🌭', address: ' 서울 중구 명동2가 101-3' },
+            { id: 'h9', name: '弘大 chung chung ', emoji: '👖', address: '서울 마포구 서교동 365-26' },  
         ]
     };
 
@@ -303,7 +310,7 @@
         if (activeTab === 'heart') {
             const filterDiv = document.createElement('div');
             filterDiv.className = 'filter-scroller';
-            const categories = ['全部', '聖水洞', '明洞', '東大門', '廣藏', '弘大'];
+            const categories = ['全部', '聖水洞', '明洞', '弘大'];
             categories.forEach(cat => {
                 const chip = document.createElement('div');
                 chip.className = `filter-chip ${currentFilter === cat ? 'active' : ''}`;
