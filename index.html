@@ -3,350 +3,499 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>KOREA.2026 | Morandi Style</title>
+    <title>KOREA.2026</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
-    
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        // Firebase 配置與初始化
-        const firebaseConfig = JSON.parse(__firebase_config);
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'korea-travel-2026-v4';
-
-        // 狀態管理
-        let state = {
-            appData: null,
-            activeTab: '1',
-            currentIndex: -1,
-            currentUser: null
-        };
-
-        const initialData = {
-            start: [
-                { id: 's1', name: '自備插座轉接頭', detail: '圓形 4.8mm 雙孔', emoji: '🔌' },
-                { id: 's2', name: '換韓幣', detail: '在台灣換 20 萬韓幣，另備台幣備用', emoji: '💰' },
-                { id: 's3', name: '刷卡須知', detail: '手續費 1.5%，滿 ₩30000 可退稅', emoji: '💳' },
-                { id: 's4', name: '藝人韓服', detail: '預約 TWD 245/人', emoji: '👘' },
-                { id: 's5', name: '愛寶樂園門票', detail: '預約 TWD 705/人', emoji: '🎢' },
-                { id: 's6', name: 'ESIM (5天10G)', detail: '$279/人', emoji: '📱' },
-                { id: 's7', name: '飯店: Aank Hotel', address: '서울 영등포구 영중로10길 10', emoji: '🏨' }
-            ],
-            days: {
-                1: [
-                    { id: 'd1-1', time: '21:35', name: '抵達仁川', emoji: '🛫' },
-                    { id: 'd1-2', time: '22:30', name: '飯店 Check-in', emoji: '🏨', transport: '機場接送', money: '₩13000/人' },
-                    { id: 'd1-3', time: '23:00', name: 'Oliveyoung Dootamall', emoji: '🪞', address: '서울 中구 장충단로 275 두산타워 B2층', transport: '夜間公車/UBER' },
-                    { id: 'd1-4', time: '00:00', name: '東大門', emoji: '🛍️', address: '서울 중구 퇴계로73길 36 1層', transport: '夜間公車/UBER' },
-                    { id: 'd1-5', time: '01:00', name: '大成精肉店 대성정육식당', emoji: '🥩', address: '서울 용산구 보광동 63-2', transport: '夜間公車/UBER' },
-                    { id: 'd1-6', time: '02:30', name: '回飯店休息', emoji: '🛌', transport: '夜間公車/UBER' }
-                ],
-                2: [
-                    { id: 'd2-1', time: '09:00', name: '景福宮 경복궁', emoji: '🏛️', address: '서울 종로구 세종로 1-1', transport: '地鐵5+3' },
-                    { id: 'd2-2', time: '10:00', name: '藝人韓服', emoji: '👘', address: '서울 종로구 체부동 60-2', transport: '🚶🏻‍➡️' },
-                    { id: 'd2-3', time: '11:30', name: 'Olive Better', emoji: '🍒', address: '서울 종로구 청진동 246', transport: '🚶🏻‍➡️' },
-                    { id: 'd2-4', time: '12:30', name: '順美家幸福的醬蟹 순미네행복게장', emoji: '🦀', address: '서울 중구 을지로6가 18-37', transport: '地鐵3+2' },
-                    { id: 'd2-5', time: '15:30', name: '廣藏市場 광장시장', emoji: '🍢', address: '서울 종로구 예지동 2-1', transport: '🚶🏻‍➡️' },
-                    { id: 'd2-6', time: '16:30', name: '明洞 명동', emoji: '🏙️', transport: '地鐵1+4' },
-                    { id: 'd2-7', time: '16:00', name: '樂天百貨 本店', emoji: '🛍️', address: '서울 중구 소공동 1', transport: '🚶🏻‍➡️' },
-                    { id: 'd2-8', time: '18:30', name: '首爾車站樂天超市', emoji: '🛒', address: '서울특별시 중구 청파로 426', transport: '地鐵4' },
-                    { id: 'd2-9', time: '20:00', name: '明倫進士燒烤 명륜진사갈비', emoji: '🥩', address: '서울 영등포구 영등포동3가 16-2', transport: '🚶🏻‍➡️' },
-                    { id: 'd2-10', time: '21:00', name: '飯店', emoji: '🏨' }
-                ],
-                3: [
-                    { id: 'd3-1', time: '10:00', name: '漢南洞 한남動', emoji: '🚇', transport: '地鐵5+6' },
-                    { id: 'd3-2', time: '12:00', name: '安木豬肉湯飯 안목 성수국밥', emoji: '🐷', address: '서울 성동구 뚝섬로13길 34 1층', transport: '地鐵6+2' },
-                    { id: 'd3-3', time: '13:30', name: '聖水洞 성수동', emoji: '☕', transport: '🚶🏻‍➡️' },
-                    { id: 'd3-4', time: '18:00', name: 'JOJO刀削麵 조조칼국수', emoji: '🍜', address: '서울 성동구 성수동2가 289-257', transport: '🚶🏻‍➡️' },
-                    { id: 'd3-5', time: '21:00', name: '飯店', emoji: '🏨', transport: '地鐵2+5' }
-                ],
-                4: [
-                    { id: 'd4-1', time: '10:00', name: '愛寶樂園 에버랜드', emoji: '🎢', transport: '專車' },
-                    { id: 'd4-2', time: '16:00', name: '醫美行程 (弘大)', emoji: '🏥', transport: '專車' },
-                    { id: 'd4-3', time: '18:00', name: 'Hongs Zzuggumi 辣炒章魚', emoji: '🐙', transport: '專車' },
-                    { id: 'd4-4', time: '19:00', name: '望遠碼頭搭船遊漢江', emoji: '🚢', address: '서울 마포구 마포나루길 442', transport: '專車' },
-                    { id: 'd4-5', time: '21:00', name: '汝矣島NO Brand', emoji: '🛒', address: '서울 영등포구 여의도동 17-3', transport: '公車/UBER' },
-                    { id: 'd4-6', time: '22:30', name: 'GOP牛腸 강남곱', emoji: '🥘', address: '서울 강남구 역삼로3길 12' }
-                ],
-                5: [
-                    { id: 'd5-1', time: '10:30', name: '出發往機場 🛫', emoji: '✈️' },
-                    { id: 'd5-2', time: '14:45', name: '搭機返台', emoji: '🇹🇼', detail: '航班回程' }
-                ]
-            },
-            heart: []
-        };
-
-        async function saveToCloud() {
-            if (!state.currentUser || !state.appData) return;
-            const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'itinerary', 'main');
-            await setDoc(docRef, state.appData);
-        }
-
-        function render() {
-            const area = document.getElementById('content-area');
-            if (!state.appData) {
-                area.innerHTML = '<div class="loading">正在連線至雲端...</div>';
-                return;
-            }
-            area.innerHTML = '';
-            
-            const card = document.createElement('div');
-            card.className = 'card';
-            let headerTxt = state.activeTab === 'start' ? '行前備忘' : state.activeTab === 'heart' ? '收藏清單' : `Day ${state.activeTab}`;
-            card.innerHTML = `<div class="section-header"><i class="fa-solid fa-calendar-day"></i> ${headerTxt}</div>`;
-
-            const list = document.createElement('div');
-            list.className = 'item-list';
-            let items = (state.activeTab === 'start' || state.activeTab === 'heart') ? state.appData[state.activeTab] : state.appData.days[state.activeTab];
-            
-            if (!items || items.length === 0) {
-                list.innerHTML = `<div class="empty-state">目前沒有項目</div>`;
-            } else {
-                items.forEach((item, idx) => {
-                    const row = document.createElement('div');
-                    row.className = 'item-row';
-                    row.innerHTML = `
-                        <div class="drag-handle"><span></span><span></span><span></span></div>
-                        ${item.time && state.activeTab !== 'start' ? `<div class="time-label">${item.time}</div>` : ''}
-                        <div class="content-box">
-                            <div class="item-name">${item.name}</div>
-                            <div class="item-desc">${item.detail || item.address || ''}</div>
-                            <div class="tag-row">
-                                ${item.transport ? `<span class="tag"><i class="fa-solid fa-bus"></i> ${item.transport}</span>` : ''}
-                                ${item.money ? `<span class="tag"><i class="fa-solid fa-won-sign"></i> ${item.money}</span>` : ''}
-                            </div>
-                        </div>
-                        <div class="emoji-icon">${item.emoji || '📍'}</div>
-                    `;
-                    row.onclick = (e) => {
-                        if (e.target.closest('.drag-handle')) return;
-                        openSheet(idx, item);
-                    };
-                    list.appendChild(row);
-                });
-            }
-            card.appendChild(list);
-            area.appendChild(card);
-            
-            new Sortable(list, { 
-                handle: '.drag-handle', animation: 200, ghostClass: 'sortable-ghost',
-                onEnd: (evt) => {
-                    const arr = (state.activeTab === 'start' || state.activeTab === 'heart') ? state.appData[state.activeTab] : state.appData.days[state.activeTab];
-                    const [moved] = arr.splice(evt.oldIndex, 1);
-                    arr.splice(evt.newIndex, 0, moved);
-                    saveToCloud();
-                }
-            });
-        }
-
-        window.switchTab = (tab) => {
-            state.activeTab = tab;
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
-            render();
-        };
-
-        window.openEdit = (idx = -1) => {
-            state.currentIndex = idx;
-            const arr = (state.activeTab === 'start' || state.activeTab === 'heart') ? state.appData[state.activeTab] : state.appData.days[state.activeTab];
-            const item = idx === -1 ? { name: '', emoji: '📍' } : arr[idx];
-            
-            document.getElementById('in-name').value = item.name || '';
-            document.getElementById('in-emoji').value = item.emoji || '';
-            document.getElementById('in-time').value = item.time || '';
-            document.getElementById('in-address').value = item.address || '';
-            document.getElementById('in-transport').value = item.transport || '';
-            document.getElementById('in-money').value = item.money || '';
-            document.getElementById('in-detail').value = item.detail || '';
-            
-            document.getElementById('modal-overlay').style.display = 'flex';
-        };
-
-        window.saveEdit = async () => {
-            const name = document.getElementById('in-name').value;
-            if (!name) return;
-            const arr = (state.activeTab === 'start' || state.activeTab === 'heart') ? state.appData[state.activeTab] : state.appData.days[state.activeTab];
-            const updated = {
-                id: state.currentIndex === -1 ? Date.now().toString() : arr[state.currentIndex].id,
-                name: name,
-                emoji: document.getElementById('in-emoji').value,
-                time: document.getElementById('in-time').value,
-                address: document.getElementById('in-address').value,
-                transport: document.getElementById('in-transport').value,
-                money: document.getElementById('in-money').value,
-                detail: document.getElementById('in-detail').value
-            };
-            if (state.currentIndex === -1) arr.push(updated);
-            else arr[state.currentIndex] = updated;
-            await saveToCloud();
-            closeModal();
-        };
-
-        window.deleteItem = async (idx) => {
-            const arr = (state.activeTab === 'start' || state.activeTab === 'heart') ? state.appData[state.activeTab] : state.appData.days[state.activeTab];
-            arr.splice(idx, 1);
-            await saveToCloud();
-        };
-
-        function openSheet(idx, item) {
-            document.getElementById('sheet-name').innerText = item.name;
-            document.getElementById('sheet-overlay').style.display = 'flex';
-            document.getElementById('sheet-nav-btn').onclick = () => {
-                if (!item.address) alert("此項目無地址資訊");
-                else window.open(`https://map.naver.com/v5/search/${encodeURIComponent(item.address)}`, '_blank');
-                closeSheet();
-            };
-            document.getElementById('sheet-edit-btn').onclick = () => { closeSheet(); window.openEdit(idx); };
-            document.getElementById('sheet-del-btn').onclick = () => {
-                if (confirm(`確定刪除「${item.name}」？`)) window.deleteItem(idx);
-                closeSheet();
-            };
-        }
-
-        window.closeSheet = () => document.getElementById('sheet-overlay').style.display = 'none';
-        window.closeModal = () => document.getElementById('modal-overlay').style.display = 'none';
-
-        async function startApp() {
-            try {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
-                }
-            } catch (err) { console.error("Auth Error:", err); }
-
-            onAuthStateChanged(auth, (user) => {
-                if (!user) return;
-                state.currentUser = user;
-                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'itinerary', 'main');
-                onSnapshot(docRef, (snapshot) => {
-                    if (snapshot.exists()) { state.appData = snapshot.data(); } 
-                    else { state.appData = initialData; saveToCloud(); }
-                    render();
-                });
-            });
-        }
-
-        window.onload = startApp;
-    </script>
-
     <style>
         :root {
-            /* 莫蘭迪調色盤 */
-            --bg: #F0F4F8; /* 淺藍灰背景 */
-            --accent: #A3B1C6; /* 莫蘭迪淺藍強調 */
-            --yellow-soft: #FEF9E7; /* 莫蘭迪柔黃 */
-            --text: #5D6D7E; /* 深灰藍文字 */
-            --white: #FFFFFF;
-            --shadow: 0 4px 15px rgba(163, 177, 198, 0.2);
-            --border: #E1E8ED;
+            --bg-gradient: linear-gradient(180deg, #eef3f7 0%, #f8fbfc 100%);
+            --card-bg: #ffffff;
+            --accent-blue: #7a92a5;
+            --text-main: #4a5568;
+            --text-light: #94a3b8;
+            --tag-bg: #f1f5f9;
+            --active-yellow: #fff9c4;
+            --shadow: 0 10px 25px rgba(149, 157, 165, 0.08);
         }
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { font-family: 'Poppins', 'Noto Sans TC', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; }
-        .container { max-width: 480px; margin: 0 auto; padding-bottom: 80px; }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+
+        body {
+            font-family: 'Poppins', 'Noto Sans TC', sans-serif;
+            background: var(--bg-gradient);
+            margin: 0; padding: 0; color: var(--text-main);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container { max-width: 480px; margin: 0 auto; padding: 30px 15px 100px 15px; }
+
         header { text-align: center; margin-bottom: 25px; }
-        header h1 { font-size: 26px; margin: 0; letter-spacing: 3px; font-weight: 700; color: var(--accent); }
-        header p { font-size: 12px; color: #ABB2B9; margin-top: 5px; }
-        
-        /* 導覽列 */
-        .nav-scroller { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 15px; position: sticky; top: 0; background: var(--bg); z-index: 100; scrollbar-width: none; margin-bottom: 15px; }
+        header h1 { font-size: 26px; font-weight: 700; color: var(--accent-blue); margin: 0; letter-spacing: 2px; }
+        header p { font-size: 12px; color: var(--text-light); margin-top: 5px; }
+
+        .nav-scroller {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            border-radius: 30px; padding: 5px;
+            display: flex; justify-content: space-between;
+            position: sticky; top: 15px; z-index: 1000;
+            box-shadow: var(--shadow); margin-bottom: 25px;
+            border: 1px solid rgba(255,255,255,0.3);
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
         .nav-scroller::-webkit-scrollbar { display: none; }
-        .nav-btn { border: 1px solid var(--border); background: var(--white); padding: 10px 20px; border-radius: 15px; font-weight: 600; cursor: pointer; white-space: nowrap; color: #95A5A6; font-size: 13px; transition: all 0.3s; }
-        .nav-btn.active { background: var(--accent); color: var(--white); border-color: var(--accent); transform: translateY(-2px); box-shadow: var(--shadow); }
-        
-        /* 卡片區域 */
-        .card { background: var(--white); border-radius: 25px; padding: 20px; box-shadow: var(--shadow); border: 1px solid var(--border); }
-        .section-header { font-weight: 700; margin-bottom: 20px; font-size: 17px; color: var(--accent); display: flex; align-items: center; gap: 8px; }
-        
-        /* 行程項目 */
-        .item-row { display: flex; align-items: center; padding: 18px 0; border-bottom: 1px solid #F7F9FB; cursor: pointer; transition: background 0.2s; }
-        .item-row:last-child { border-bottom: none; }
-        .drag-handle { color: #D5DBDB; display: flex; flex-direction: column; gap: 3px; padding-right: 12px; }
-        .drag-handle span { width: 14px; height: 2px; background: #D5DBDB; border-radius: 2px; }
-        .time-label { width: 65px; font-weight: 700; font-size: 14px; color: var(--accent); }
-        .content-box { flex: 1; padding-right: 10px; min-width: 0; }
-        .item-name { font-size: 16px; font-weight: 600; color: #2C3E50; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .item-desc { font-size: 11px; color: #AAB7B8; margin-top: 4px; line-height: 1.4; }
-        .tag-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
-        .tag { font-size: 10px; background: var(--yellow-soft); padding: 3px 8px; border-radius: 6px; color: #D4AC0D; font-weight: 600; border: 1px solid #F9E79F; }
-        .emoji-icon { font-size: 22px; width: 35px; text-align: right; }
 
-        /* 浮動按鈕 */
-        .fab { position: fixed; bottom: 30px; right: 25px; width: 60px; height: 60px; background: var(--accent); color: var(--white); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 26px; box-shadow: 0 10px 25px rgba(163, 177, 198, 0.4); cursor: pointer; z-index: 500; transition: transform 0.3s; }
-        .fab:active { transform: scale(0.9); }
+        .nav-btn {
+            border: none; background: none; flex-shrink: 0;
+            padding: 10px 15px; font-size: 12px; font-weight: 700;
+            color: var(--text-light); border-radius: 25px;
+            cursor: pointer; transition: all 0.2s ease;
+        }
 
-        /* 彈窗與單據 */
-        .sheet-overlay, .modal-overlay { position: fixed; inset: 0; background: rgba(93, 109, 126, 0.4); backdrop-filter: blur(4px); display: none; z-index: 1000; align-items: flex-end; }
-        .modal-overlay { align-items: center; justify-content: center; padding: 20px; }
-        .sheet, .modal { background: var(--white); width: 100%; max-width: 480px; padding: 30px; border-radius: 30px 30px 0 0; border-top: 2px solid var(--accent); }
-        .modal { border-radius: 30px; max-height: 85vh; overflow-y: auto; border: 1px solid var(--border); }
-        
-        .btn-action { width: 100%; padding: 16px; border-radius: 18px; border: none; font-weight: 700; margin-top: 12px; cursor: pointer; font-size: 15px; display: flex; align-items: center; justify-content: center; gap: 10px; transition: all 0.3s; }
-        .btn-action:active { transform: scale(0.98); }
-        
-        .form-group { margin-bottom: 18px; }
-        .form-group label { display: block; font-size: 12px; font-weight: 700; color: var(--accent); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 1px; }
-        .form-group input, .form-group textarea { width: 100%; padding: 14px; border: 1px solid var(--border); border-radius: 15px; font-size: 14px; background: #FDFEFE; color: var(--text); outline: none; transition: border-color 0.3s; }
-        .form-group input:focus { border-color: var(--accent); }
+        .nav-btn.active { 
+            background: var(--active-yellow); color: #5a6a7a;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
 
-        .empty-state { padding: 40px 0; text-align: center; color: #BDC3C7; font-size: 14px; }
-        .sortable-ghost { opacity: 0.3; background: var(--yellow-soft); }
+        .filter-scroller {
+            display: flex; gap: 8px; overflow-x: auto;
+            margin-bottom: 15px; padding-bottom: 5px;
+            scrollbar-width: none;
+        }
+        .filter-scroller::-webkit-scrollbar { display: none; }
+        .filter-chip {
+            white-space: nowrap; padding: 6px 14px; border-radius: 20px;
+            background: #fff; border: 1px solid #e2e8f0; font-size: 12px;
+            color: #64748b; cursor: pointer; transition: all 0.2s;
+        }
+        .filter-chip.active {
+            background: var(--accent-blue); color: white; border-color: var(--accent-blue);
+        }
+
+        .card {
+            background: var(--card-bg); border-radius: 30px; padding: 20px;
+            box-shadow: var(--shadow); margin-bottom: 20px;
+            border: 1px solid rgba(255,255,255,0.5);
+        }
+
+        .section-header { 
+            font-size: 15px; font-weight: 700; color: var(--accent-blue); 
+            margin-bottom: 18px; display: flex; align-items: center; gap: 8px;
+        }
+
+        .item-list { display: flex; flex-direction: column; gap: 10px; min-height: 50px; }
+
+        .item-row {
+            background: white; border-radius: 20px; padding: 14px;
+            display: flex; align-items: center; gap: 10px;
+            border: 1px solid #f1f5f9; cursor: pointer; position: relative;
+            transition: transform 0.1s;
+        }
+        .sortable-ghost { opacity: 0.4; background: #e2e8f0; }
+        .sortable-drag { opacity: 0.9; transform: scale(1.02); box-shadow: 0 15px 30px rgba(0,0,0,0.1); }
+
+        .drag-handle { 
+            color: #cbd5e1; 
+            padding: 10px 5px;
+            cursor: grab;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+        .drag-handle span { width: 12px; height: 2px; background: #cbd5e1; border-radius: 2px; }
+
+        .time-label { font-size: 13px; font-weight: 700; color: var(--accent-blue); width: 45px; flex-shrink: 0; }
+        .content-box { flex: 1; min-width: 0; }
+        .item-name { font-size: 14px; font-weight: 600; color: #334155; margin-bottom: 3px; line-height: 1.4; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .item-desc { font-size: 11px; color: var(--text-light); line-height: 1.3; }
+        
+        .tag-row { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 6px; }
+        .tag {
+            background: var(--tag-bg); color: #64748b; padding: 2px 8px;
+            border-radius: 6px; font-size: 10px; font-weight: 700;
+            display: inline-flex; align-items: center; gap: 3px;
+        }
+        .emoji-icon { font-size: 20px; flex-shrink: 0; }
+
+        .fab-group { position: fixed; bottom: 30px; right: 20px; display: flex; flex-direction: column; gap: 12px; z-index: 500; }
+        .btn-fab {
+            width: 54px; height: 54px; border-radius: 50%; border: none;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1); cursor: pointer;
+        }
+        .btn-fab.add { background: #7a92a5; color: white; font-size: 22px; }
+
+        .sheet-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px); display: none; z-index: 2000;
+            align-items: flex-end;
+        }
+        .sheet {
+            background: white; width: 100%; border-radius: 30px 30px 0 0;
+            padding: 25px; animation: slideUp 0.3s ease; max-width: 480px; margin: 0 auto;
+        }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        .sheet-title { font-size: 16px; font-weight: 700; color: var(--accent-blue); margin-bottom: 20px; text-align: center; }
+        .sheet-options { display: flex; flex-direction: column; gap: 10px; }
+        .sheet-btn {
+            width: 100%; padding: 15px; border-radius: 16px; border: none;
+            font-size: 14px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer;
+        }
+        .btn-nav { background: #e0f2fe; color: #0369a1; }
+        .btn-edit { background: #fef9c3; color: #854d0e; }
+        .btn-del { background: #fee2e2; color: #b91c1c; }
+        .btn-cancel { background: #f1f5f9; color: #64748b; }
+
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.4);
+            backdrop-filter: blur(8px); display: none; z-index: 3000;
+            align-items: center; justify-content: center; padding: 15px;
+        }
+        .modal {
+            background: white; width: 100%; max-width: 400px;
+            border-radius: 30px; padding: 25px; position: relative;
+            max-height: 85vh; overflow-y: auto;
+        }
+        .form-row { display: flex; gap: 10px; margin-bottom: 12px; }
+        .form-group { margin-bottom: 12px; flex: 1; }
+        .form-group label { display: block; font-size: 11px; font-weight: 700; color: #94a3b8; margin-bottom: 6px; }
+        .form-group input, .form-group textarea {
+            width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #e2e8f0; font-size: 14px; font-family: inherit;
+        }
+        .btn-save { width: 100%; background: #7a92a5; color: white; border: none; padding: 15px; border-radius: 15px; font-weight: 700; cursor: pointer; font-size: 15px; margin-top: 10px; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <header><h1>KOREA.2026</h1><p>莫蘭迪色系旅程 | 04.25 - 04.29</p></header>
+    <header>
+        <h1>KOREA.2026</h1>
+        <p>2026.04.25 - 04.29</p>
+    </header>
+
     <nav class="nav-scroller" id="main-nav">
-        <button class="nav-btn active" data-tab="1" onclick="switchTab('1')">Day 1</button>
-        <button class="nav-btn" data-tab="2" onclick="switchTab('2')">Day 2</button>
-        <button class="nav-btn" data-tab="3" onclick="switchTab('3')">Day 3</button>
-        <button class="nav-btn" data-tab="4" onclick="switchTab('4')">Day 4</button>
-        <button class="nav-btn" data-tab="5" onclick="switchTab('5')">Day 5</button>
-        <button class="nav-btn" data-tab="start" onclick="switchTab('start')">行前</button>
-        <button class="nav-btn" data-tab="heart" onclick="switchTab('heart')"><i class="fa-solid fa-heart"></i></button>
+        <button class="nav-btn active" data-tab="start">行前</button>
+        <button class="nav-btn" data-tab="1">D1</button>
+        <button class="nav-btn" data-tab="2">D2</button>
+        <button class="nav-btn" data-tab="3">D3</button>
+        <button class="nav-btn" data-tab="4">D4</button>
+        <button class="nav-btn" data-tab="5">D5</button>
+        <button class="nav-btn" data-tab="heart"><i class="fa-solid fa-heart"></i></button>
     </nav>
+
     <div id="content-area"></div>
 </div>
 
-<div class="fab" onclick="openEdit()"><i class="fa-solid fa-plus"></i></div>
+<div class="fab-group">
+    <button class="btn-fab add" id="add-btn"><i class="fa-solid fa-plus"></i></button>
+</div>
 
-<!-- 底部署標單 -->
-<div class="sheet-overlay" id="sheet-overlay" onclick="closeSheet()">
-    <div class="sheet" onclick="event.stopPropagation()">
-        <div id="sheet-name" style="font-size:20px; font-weight:700; margin-bottom:25px; text-align:center; color:#2C3E50;"></div>
-        <button class="btn-action" id="sheet-nav-btn" style="background:var(--accent); color:var(--white); box-shadow: var(--shadow);"><i class="fa-solid fa-location-arrow"></i> Naver Map 導航</button>
-        <button class="btn-action" id="sheet-edit-btn" style="background:var(--white); border: 1px solid var(--border); color: var(--text);"><i class="fa-solid fa-pen"></i> 編輯行程內容</button>
-        <button class="btn-action" id="sheet-del-btn" style="background:#FDEDEC; color:#E74C3C;"><i class="fa-solid fa-trash"></i> 刪除此項目</button>
+<!-- 操作選單 -->
+<div class="sheet-overlay" id="sheet-overlay">
+    <div class="sheet">
+        <div class="sheet-title" id="sheet-name">項目名稱</div>
+        <div class="sheet-options">
+            <button class="sheet-btn btn-nav" id="sheet-nav-btn"><i class="fa-solid fa-location-arrow"></i> 導航 (Naver Map)</button>
+            <button class="sheet-btn btn-edit" id="sheet-edit-btn"><i class="fa-solid fa-pen"></i> 編輯行程</button>
+            <button class="sheet-btn btn-del" id="sheet-del-btn"><i class="fa-solid fa-trash"></i> 刪除項目</button>
+            <button class="sheet-btn btn-cancel" onclick="closeSheet()">取消</button>
+        </div>
     </div>
 </div>
 
-<!-- 編輯彈窗 -->
-<div class="modal-overlay" id="modal-overlay" onclick="closeModal()">
-    <div class="modal" onclick="event.stopPropagation()">
-        <div style="font-size:18px; font-weight:700; margin-bottom:25px; color: var(--accent);">編輯行程項目</div>
-        <div class="form-group"><label>項目名稱 *</label><input type="text" id="in-name"></div>
-        <div style="display:flex; gap:12px;">
-            <div class="form-group" style="flex:2;"><label>預計時間</label><input type="text" id="in-time" placeholder="例如 14:00"></div>
-            <div class="form-group" style="flex:1;"><label>Emoji</label><input type="text" id="in-emoji"></div>
+<!-- 編輯視窗 -->
+<div class="modal-overlay" id="modal-overlay">
+    <div class="modal">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+            <h2 id="modal-title" style="margin:0; font-size:18px; color:var(--accent-blue)">編輯內容</h2>
+            <span onclick="closeModal()" style="cursor:pointer; font-size:24px; color:#cbd5e1">&times;</span>
         </div>
-        <div class="form-group"><label>韓國地址 / 店名</label><input type="text" id="in-address"></div>
-        <div style="display:flex; gap:12px;">
-            <div class="form-group" style="flex:1;"><label>交通方式</label><input type="text" id="in-transport"></div>
-            <div class="form-group" style="flex:1;"><label>費用備註</label><input type="text" id="in-money"></div>
+        <div class="form-group"><label>名稱 *</label><input type="text" id="in-name"></div>
+        <div class="form-row">
+            <div class="form-group"><label>時間</label><input type="time" id="in-time"></div>
+            <div class="form-group"><label>Emoji</label><input type="text" id="in-emoji"></div>
         </div>
-        <div class="form-group"><label>詳細描述</label><textarea id="in-detail" rows="2"></textarea></div>
-        <button class="btn-action" style="background:var(--accent); color:var(--white); box-shadow: var(--shadow);" onclick="saveEdit()">儲存行程更新</button>
-        <button class="btn-action" style="background:none; color:#ABB2B9; font-size:13px;" onclick="closeModal()">取消返回</button>
+        <div class="form-group"><label>韓文名稱/地址</label><input type="text" id="in-address"></div>
+        <div class="form-row">
+            <div class="form-group"><label>交通方式</label><input type="text" id="in-transport"></div>
+            <div class="form-group"><label>預算/金額</label><input type="text" id="in-money"></div>
+        </div>
+        <div class="form-group"><label>詳細備註</label><textarea id="in-detail" rows="3"></textarea></div>
+        <button class="btn-save" id="save-btn">儲存變更</button>
     </div>
 </div>
+
+<script>
+    const STORAGE_KEY = 'korea_2026_itinerary_v4';
+    
+    // 初始化資料（完全保留使用者韓文原始字元）
+    const initialData = {
+        start: [
+            { id: 's1', name: '自備插座轉接頭', detail: '圓形 4.8mm 雙孔', emoji: '🔌' },
+            { id: 's2', name: '換韓幣', detail: '在台灣換 20 萬韓幣，另備台幣備用', emoji: '💰' },
+            { id: 's3', name: '刷卡須知', detail: '手續費 1.5%，滿 ₩30000 可退稅', emoji: '💳' },
+            { id: 's4', name: '藝人韓服', detail: '預約 TWD 245/人', emoji: '👘' },
+            { id: 's5', name: '愛寶樂園門票', detail: '預約 TWD 705/人', emoji: '🎢' },
+            { id: 's6', name: 'ESIM (5天10G)', detail: '$279/人', emoji: '📱' },
+            { id: 's7', name: '飯店: Aank Hotel', address: '서울 영등포구 영중로10길 10', emoji: '🏨' }
+        ],
+        days: {
+            1: [
+                { id: 'd1-1', time: '21:35', name: '抵達仁川', emoji: '🛫', detail: '辦理出關' },
+                { id: 'd1-2', time: '22:30', name: '飯店 Check-in', emoji: '🏨', transport: '機場接送', money: '₩13000/人' },
+                { id: 'd1-3', time: '23:00', name: 'Oliveyoung Dootamall', emoji: '🪞', address: '서울 중구 장충단로 275 두산타워 B2층', transport: '夜間公車/UBER' },
+                { id: 'd1-4', time: '00:00', name: '東大門', emoji: '🛍️', address: '서울 중구 퇴계로73길 36 1층', transport: '夜間公車/UBER' },
+                { id: 'd1-5', time: '01:00', name: '大成精肉店 대성정육식당', emoji: '🥩', address: '서울 용산구 보광동 63-2', transport: '夜間公車/UBER' },
+                { id: 'd1-6', time: '02:30', name: '回飯店休息', emoji: '😴' }
+            ],
+            2: [
+                { id: 'd2-1', time: '09:00', name: '景福宮 경복궁', emoji: '🏛️', address: '서울 종로구 세종로 1-1', transport: '地鐵5+3' },
+                { id: 'd2-2', time: '10:00', name: '藝人韓服 연예인 한복', emoji: '👘', address: '서울 종로구 체부동 60-2', transport: '🚶🏻‍➡️' },
+                { id: 'd2-3', time: '11:30', name: 'Olive Better', emoji: '🍒', address: '서울 종로구 청진동 246', transport: '🚶🏻‍➡️' },
+                { id: 'd2-4', time: '12:30', name: '順美家幸福的醬蟹 순미네행복게장 동大門', emoji: '🦀', address: '서울 중구 을지로6가 18-37', transport: '地鐵3+2' },
+                { id: 'd2-5', time: '15:30', name: '廣藏市場 광장시장', emoji: '🍢', address: '서울 종로구 예지동 2-1', transport: '🚶🏻‍➡️' },
+                { id: 'd2-6', time: '16:30', name: '明洞', emoji: '🏙️', address: '서울 중구 소공동 1', transport: '地鐵1+4' },
+                { id: 'd2-7', time: '16:00', name: '明洞樂天百貨 롯데백화점 본점', emoji: '🛍️', address: '서울 中區 小公洞 1', transport: '🚶🏻‍➡️' },
+                { id: 'd2-8', time: '18:30', name: '樂天超市 롯데마트 서울역점', emoji: '🛒', address: '서울특별시 중구 청파로 426', transport: '地鐵4' },
+                { id: 'd2-9', time: '20:00', name: '明倫進士燒烤 명륜진사갈비 영등포역점', emoji: '🥩', address: '서울 영등포구 영등포동3가 16-2', transport: '🚶🏻‍➡️' }
+            ],
+            3: [
+                { id: 'd3-1', time: '10:00', name: '漢南洞 한남동', emoji: '🚇', address: '서울 용산구 한남동', transport: '地鐵5+6' },
+                { id: 'd3-2', time: '12:00', name: '安木豬肉湯飯 성수', emoji: '🐷', address: '서울 성동구 뚝섬로13길 34 1층', transport: '地鐵6+2' },
+                { id: 'd3-3', time: '13:30', name: '聖水洞 성수동', emoji: '☕', address: '서울 성동구 성수동', transport: '🚶🏻‍➡️' },
+                { id: 'd3-4', time: '18:00', name: 'JOJO刀削麵', emoji: '🍜', address: '서울 성동구 성수동2가 289-257', transport: '🚶🏻‍➡️' },
+                { id: 'd3-5', time: '21:00', name: '回飯店', emoji: '🏨', transport: '地鐵2+5' }
+            ],
+            4: [
+                { id: 'd4-1', time: '10:00', name: '愛寶樂園 에버랜드', emoji: '🎢', address: '경기도 용인시 처인구 포곡읍 에버랜드로 199', transport: '專車' },
+                { id: 'd4-2', time: '16:00', name: '醫美行程 (弘大)', emoji: '🏥', transport: '專車' },
+                { id: 'd4-3', time: '18:00', name: 'Hongs Zzuggumi 辣炒章魚', emoji: '🐙', transport: '專車' },
+                { id: 'd4-4', time: '19:00', name: '望遠碼頭搭船遊漢江', emoji: '🚢', address: '서울 마포구 마포나루길 442', transport: '專車' },
+                { id: 'd4-5', time: '21:00', name: '汝矣島No Brand 노브랜드 영등포여의도점', emoji: '🏪', address: '서울 영등포구 여의도동 17-3', transport: '公車/UBER' },
+                { id: 'd4-6', time: '22:30', name: 'GOP牛腸강남곱', emoji: '🥘', address: '서울 강남구 역삼로3길 12', transport: '公車/UBER' }
+            ],
+            5: [
+                { id: 'd5-1', time: '10:30', name: '出發往機場', emoji: '🛫', transport: '巴士/機場接送', detail: '準備返台' },
+                { id: 'd5-2', time: '14:45', name: '搭機返台', emoji: '✈️', detail: '航班回程' }
+            ]
+        },
+        heart: [
+            { id: 'h1', name: '聖水洞咖啡廳', detail: '熱門打卡點', emoji: '☕', address: '성수동' },
+            { id: 'h2', name: '弘大延南洞', detail: '文青散步', emoji: '🌳', address: '연남동' }
+        ]
+    };
+
+    let appData = JSON.parse(localStorage.getItem(STORAGE_KEY)) || initialData;
+    let activeTab = 'start';
+    let currentFilter = '全部';
+    let currentIndex = -1;
+
+    function render() {
+        const area = document.getElementById('content-area');
+        area.innerHTML = '';
+        
+        if (activeTab === 'heart') {
+            const filterDiv = document.createElement('div');
+            filterDiv.className = 'filter-scroller';
+            const categories = ['全部', '聖水洞', '明洞', '東大門', '廣藏', '弘大'];
+            categories.forEach(cat => {
+                const chip = document.createElement('div');
+                chip.className = `filter-chip ${currentFilter === cat ? 'active' : ''}`;
+                chip.innerText = cat;
+                chip.onclick = () => {
+                    currentFilter = cat;
+                    render();
+                };
+                filterDiv.appendChild(chip);
+            });
+            area.appendChild(filterDiv);
+        }
+
+        const card = document.createElement('div');
+        card.className = 'card';
+
+        let headerTxt = '';
+        if (activeTab === 'start') headerTxt = '行前備忘';
+        else if (activeTab === 'heart') headerTxt = '收藏清單';
+        else headerTxt = `Day ${activeTab} 行程`;
+
+        card.innerHTML = `<div class="section-header"><i class="fa-solid fa-calendar-day"></i> ${headerTxt}</div>`;
+
+        const list = document.createElement('div');
+        list.className = 'item-list';
+        
+        let items = (activeTab === 'start' || activeTab === 'heart') ? appData[activeTab] : appData.days[activeTab];
+        
+        if (activeTab === 'heart' && currentFilter !== '全部') {
+            items = items.filter(i => 
+                (i.name && i.name.includes(currentFilter)) || 
+                (i.address && i.address.includes(currentFilter)) ||
+                (i.detail && i.detail.includes(currentFilter))
+            );
+        }
+
+        if (!items || items.length === 0) {
+            list.innerHTML = `<div style="text-align:center; padding:40px; color:#cbd5e1; font-size:13px">尚未規劃${activeTab === 'heart' ? currentFilter : ''}項目</div>`;
+        } else {
+            items.forEach((item, idx) => {
+                const row = document.createElement('div');
+                row.className = 'item-row';
+                row.innerHTML = `
+                    <div class="drag-handle"><span></span><span></span><span></span></div>
+                    ${item.time && activeTab !== 'start' ? `<div class="time-label">${item.time}</div>` : ''}
+                    <div class="content-box" onclick="handleItemClick(${idx})">
+                        <div class="item-name">${item.name}</div>
+                        ${item.detail ? `<div class="item-desc">${item.detail}</div>` : ''}
+                        <div class="tag-row">
+                            ${item.transport ? `<span class="tag"><i class="fa-solid fa-bus"></i> ${item.transport}</span>` : ''}
+                            ${item.money ? `<span class="tag"><i class="fa-solid fa-won-sign"></i> ${item.money}</span>` : ''}
+                        </div>
+                    </div>
+                    <div class="emoji-icon" onclick="handleItemClick(${idx})">${item.emoji || '📍'}</div>
+                `;
+                list.appendChild(row);
+            });
+        }
+
+        card.appendChild(list);
+        area.appendChild(card);
+        
+        if (activeTab !== 'heart' || currentFilter === '全部') {
+            new Sortable(list, { 
+                handle: '.drag-handle',
+                animation: 200,
+                ghostClass: 'sortable-ghost',
+                dragClass: 'sortable-drag',
+                onEnd: (evt) => {
+                    const arr = (activeTab === 'start' || activeTab === 'heart') ? appData[activeTab] : appData.days[activeTab];
+                    const [moved] = arr.splice(evt.oldIndex, 1);
+                    arr.splice(evt.newIndex, 0, moved);
+                    save();
+                }
+            });
+        }
+    }
+
+    function handleItemClick(idx) {
+        const arr = (activeTab === 'start' || activeTab === 'heart') ? appData[activeTab] : appData.days[activeTab];
+        let item;
+        if (activeTab === 'heart' && currentFilter !== '全部') {
+             item = appData.heart.filter(i => 
+                (i.name && i.name.includes(currentFilter)) || 
+                (i.address && i.address.includes(currentFilter)) ||
+                (i.detail && i.detail.includes(currentFilter))
+            )[idx];
+            currentIndex = appData.heart.findIndex(i => i.id === item.id);
+        } else {
+            currentIndex = idx;
+            item = arr[idx];
+        }
+        openSheet(currentIndex, item);
+    }
+
+    function openSheet(idx, item) {
+        document.getElementById('sheet-name').innerText = item.name;
+        document.getElementById('sheet-overlay').style.display = 'flex';
+
+        document.getElementById('sheet-nav-btn').onclick = () => {
+            if (!item.address) {
+                alert("此行程無地址資訊，請編輯後導航");
+            } else {
+                let url = `https://map.naver.com/v5/search/${encodeURIComponent(item.address)}`;
+                window.open(url, '_blank');
+            }
+            closeSheet();
+        };
+
+        document.getElementById('sheet-edit-btn').onclick = () => {
+            closeSheet();
+            openEdit(idx);
+        };
+
+        document.getElementById('sheet-del-btn').onclick = () => {
+            if (confirm(`確定刪除「${item.name}」？`)) {
+                const arr = (activeTab === 'start' || activeTab === 'heart') ? appData[activeTab] : appData.days[activeTab];
+                arr.splice(idx, 1);
+                save();
+            }
+            closeSheet();
+        };
+    }
+
+    function closeSheet() { document.getElementById('sheet-overlay').style.display = 'none'; }
+
+    function openEdit(idx = -1) {
+        currentIndex = idx;
+        const arr = (activeTab === 'start' || activeTab === 'heart') ? appData[activeTab] : appData.days[activeTab];
+        const item = idx === -1 ? { name: '', emoji: '📍', time: '', address: '', detail: '', transport: '', money: '' } : arr[idx];
+
+        document.getElementById('in-name').value = item.name;
+        document.getElementById('in-emoji').value = item.emoji || '';
+        document.getElementById('in-time').value = item.time || '';
+        document.getElementById('in-address').value = item.address || '';
+        document.getElementById('in-transport').value = item.transport || '';
+        document.getElementById('in-money').value = item.money || '';
+        document.getElementById('in-detail').value = item.detail || '';
+        
+        document.getElementById('modal-title').innerText = idx === -1 ? '新增項目' : '編輯行程';
+        document.getElementById('modal-overlay').style.display = 'flex';
+    }
+
+    function saveEdit() {
+        const name = document.getElementById('in-name').value;
+        if (!name) return;
+
+        const arr = (activeTab === 'start' || activeTab === 'heart') ? appData[activeTab] : appData.days[activeTab];
+        const updated = {
+            id: currentIndex === -1 ? Date.now().toString() : arr[currentIndex].id,
+            name: name,
+            emoji: document.getElementById('in-emoji').value,
+            time: document.getElementById('in-time').value,
+            address: document.getElementById('in-address').value,
+            transport: document.getElementById('in-transport').value,
+            money: document.getElementById('in-money').value,
+            detail: document.getElementById('in-detail').value
+        };
+
+        if (currentIndex === -1) arr.push(updated);
+        else arr[currentIndex] = updated;
+
+        save();
+        closeModal();
+    }
+
+    function save() {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
+        render();
+    }
+
+    function closeModal() { document.getElementById('modal-overlay').style.display = 'none'; }
+
+    document.getElementById('main-nav').onclick = (e) => {
+        const btn = e.target.closest('.nav-btn');
+        if (!btn) return;
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        activeTab = btn.dataset.tab;
+        currentFilter = '全部';
+        render();
+    };
+
+    document.getElementById('add-btn').onclick = () => openEdit();
+    document.getElementById('save-btn').onclick = saveEdit;
+
+    window.onclick = (e) => {
+        if (e.target.id === 'sheet-overlay') closeSheet();
+        if (e.target.id === 'modal-overlay') closeModal();
+    };
+
+    window.onload = render;
+</script>
 
 </body>
 </html>
