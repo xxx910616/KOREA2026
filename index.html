@@ -122,14 +122,7 @@
         }
         .emoji-icon { font-size: 20px; flex-shrink: 0; }
 
-        .fab-group { position: fixed; bottom: 30px; right: 20px; display: flex; flex-direction: column; gap: 12px; z-index: 500; }
-        .btn-fab {
-            width: 54px; height: 54px; border-radius: 50%; border: none;
-            display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1); cursor: pointer;
-        }
-        .btn-fab.add { background: #7a92a5; color: white; font-size: 22px; }
-
+        /* Bottom Sheet 樣式 */
         .sheet-overlay {
             position: fixed; inset: 0; background: rgba(0,0,0,0.5);
             backdrop-filter: blur(4px); display: none; z-index: 2000;
@@ -147,27 +140,7 @@
             font-size: 14px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer;
         }
         .btn-nav { background: #e0f2fe; color: #0369a1; }
-        .btn-edit { background: #fef9c3; color: #854d0e; }
-        .btn-del { background: #fee2e2; color: #b91c1c; }
         .btn-cancel { background: #f1f5f9; color: #64748b; }
-
-        .modal-overlay {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.4);
-            backdrop-filter: blur(8px); display: none; z-index: 3000;
-            align-items: center; justify-content: center; padding: 15px;
-        }
-        .modal {
-            background: white; width: 100%; max-width: 400px;
-            border-radius: 30px; padding: 25px; position: relative;
-            max-height: 85vh; overflow-y: auto;
-        }
-        .form-row { display: flex; gap: 10px; margin-bottom: 12px; }
-        .form-group { margin-bottom: 12px; flex: 1; }
-        .form-group label { display: block; font-size: 11px; font-weight: 700; color: #94a3b8; margin-bottom: 6px; }
-        .form-group input, .form-group textarea {
-            width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #e2e8f0; font-size: 14px; font-family: inherit;
-        }
-        .btn-save { width: 100%; background: #7a92a5; color: white; border: none; padding: 15px; border-radius: 15px; font-weight: 700; cursor: pointer; font-size: 15px; margin-top: 10px; }
     </style>
 </head>
 <body>
@@ -191,48 +164,19 @@
     <div id="content-area"></div>
 </div>
 
-<div class="fab-group">
-    <button class="btn-fab add" id="add-btn"><i class="fa-solid fa-plus"></i></button>
-</div>
-
 <div class="sheet-overlay" id="sheet-overlay">
     <div class="sheet">
         <div class="sheet-title" id="sheet-name">項目名稱</div>
         <div class="sheet-options">
             <button class="sheet-btn btn-nav" id="sheet-nav-btn"><i class="fa-solid fa-location-arrow"></i> 導航 (Naver Map)</button>
-            <button class="sheet-btn btn-edit" id="sheet-edit-btn"><i class="fa-solid fa-pen"></i> 編輯行程</button>
-            <button class="sheet-btn btn-del" id="sheet-del-btn"><i class="fa-solid fa-trash"></i> 刪除項目</button>
-            <button class="sheet-btn btn-cancel" onclick="closeSheet()">取消</button>
+            <button class="sheet-btn btn-cancel" onclick="closeSheet()">關閉</button>
         </div>
-    </div>
-</div>
-
-<div class="modal-overlay" id="modal-overlay">
-    <div class="modal">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-            <h2 id="modal-title" style="margin:0; font-size:18px; color:var(--accent-blue)">編輯內容</h2>
-            <span onclick="closeModal()" style="cursor:pointer; font-size:24px; color:#cbd5e1">&times;</span>
-        </div>
-        <div class="form-group"><label>名稱 *</label><input type="text" id="in-name"></div>
-        <div class="form-row">
-            <div class="form-group"><label>時間</label><input type="time" id="in-time"></div>
-            <div class="form-group"><label>Emoji</label><input type="text" id="in-emoji"></div>
-        </div>
-        <div class="form-group"><label>韓文名稱/地址</label><input type="text" id="in-address"></div>
-        <div class="form-row">
-            <div class="form-group"><label>交通方式</label><input type="text" id="in-transport"></div>
-            <div class="form-group"><label>預算/金額</label><input type="text" id="in-money"></div>
-        </div>
-        <div class="form-group"><label>詳細備註</label><textarea id="in-detail" rows="3"></textarea></div>
-        <button class="btn-save" id="save-btn">儲存變更</button>
     </div>
 </div>
 
 <script>
-    const STORAGE_KEY = 'korea_2026_itinerary_v4';
-    
-    // 初始化資料（已修復逗號與引號語法錯誤）
-    const initialData = {
+    // 預設資料
+    const appData = {
         start: [
             { id: 's1', name: '自備插座轉接頭', detail: '圓形 4.8mm 雙孔', emoji: '🔌' },
             { id: 's2', name: '換韓幣', detail: '在台灣換 10 萬韓幣，另備5千-1萬台幣備用', emoji: '💰' },
@@ -248,12 +192,12 @@
                 { id: 'd1-2', time: '22:30', name: '飯店 Check-in', emoji: '🏨', transport: '機場接送', money: '₩13000/人' },
                 { id: 'd1-3', time: '23:00', name: 'Oliveyoung Dootamall', emoji: '🪞', address: '서울 중구 장충단로 275 두산타워 B2층', transport: '夜間公車/UBER' },
                 { id: 'd1-4', time: '00:00', name: 'The mask shop', emoji: '🛍️', address: '서울 중구 퇴계로73길 36 1층', transport: '夜間公車/UBER' },
-                { id: 'd1-5', time: '01:00', name: '大成精肉店 대성정육식당', emoji: '🥩', address: '서울 용산구 보광동 63-2', transport: '夜間公車/UBER' },
+                { id: 'd1-5', time: '01:00', name: '大成精肉店 대성정육식당', emoji: '🥩', address: '서울 용산구 보광動 63-2', transport: '夜間公車/UBER' },
                 { id: 'd1-6', time: '02:30', name: '飯店', emoji: '🏨', transport: '夜間公車/UBER' }
             ],
             2: [
                 { id: 'd2-1', time: '09:00', name: '藝人韓服 연예인 한복', emoji: '👘', address: '서울 종로구 체부동 60-2', transport: '地鐵1+3' },
-                    { id: 'd2-3', time: '11:30', name: 'Olive Better', emoji: '🍒', address: '서울 종로구 청진動 246', transport: '🚶🏻‍➡️' },
+                { id: 'd2-3', time: '11:30', name: 'Olive Better', emoji: '🍒', address: '서울 종路구 청진動 246', transport: '🚶🏻‍➡️' },
                 { id: 'd2-4', time: '12:30', name: '順美家幸福的醬蟹 순미네행복게장 동大門', emoji: '🦀', address: '서울 중구 을지로6가 18-37', transport: '地鐵3+2' },
                 { id: 'd2-5', time: '15:30', name: '廣藏市場 광장시장', emoji: '🍢', address: '서울 종로구 예지동 2-1', transport: '🚶🏻‍➡️' },
                 { id: 'd2-6', time: '16:30', name: '明洞', emoji: '🏙️', address: '서울 중구 소공동 1', transport: '地鐵1+4' },
@@ -290,15 +234,13 @@
             { id: 'h5', name: '明洞 FRESH BREAD FACTORY 갓구운빵공場 明洞2號店', emoji: '🥐', address: '서울 중구 명동1가 34-1' },
             { id: 'h6', name: '明洞 烤起司年糕', emoji: '🧀', address: '서울 중구 명동1가 61-2' },
             { id: 'h7', name: '明洞 大創旗艦店 명동역점', emoji: '📃', address: ' 서울중구퇴계로134-1' },
-            { id: 'h8', name: '明洞 明朗熱狗 명랑핫도그 명동중앙우체국점', emoji: '🌭', address: ' 서울 중구 명동2가 101-3' },
+            { id: 'h8', name: '明洞 明朗熱狗 명랑핫도그 명동중앙우체국점', emoji: '🌭', address: ' 서울 중구 명動2가 101-3' },
             { id: 'h9', name: '弘大 chung chung ', emoji: '👖', address: '서울 마포구 서교동 365-26' }
         ]
     };
 
-    let appData = JSON.parse(localStorage.getItem(STORAGE_KEY)) || initialData;
     let activeTab = 'start';
     let currentFilter = '全部';
-    let currentIndex = -1;
 
     function render() {
         const area = document.getElementById('content-area');
@@ -339,147 +281,51 @@
         if (activeTab === 'heart' && currentFilter !== '全部') {
             items = items.filter(i => 
                 (i.name && i.name.includes(currentFilter)) || 
-                (i.address && i.address.includes(currentFilter)) ||
-                (i.detail && i.detail.includes(currentFilter))
+                (i.address && i.address.includes(currentFilter))
             );
         }
 
-        if (!items || items.length === 0) {
-            list.innerHTML = `<div style="text-align:center; padding:40px; color:#cbd5e1; font-size:13px">尚未規劃${activeTab === 'heart' ? currentFilter : ''}項目</div>`;
-        } else {
-            items.forEach((item, idx) => {
-                const row = document.createElement('div');
-                row.className = 'item-row';
-                row.innerHTML = `
-                    <div class="drag-handle"><span></span><span></span><span></span></div>
-                    ${item.time && activeTab !== 'start' ? `<div class="time-label">${item.time}</div>` : ''}
-                    <div class="content-box" onclick="handleItemClick(${idx})">
-                        <div class="item-name">${item.name}</div>
-                        ${item.detail ? `<div class="item-desc">${item.detail}</div>` : ''}
-                        <div class="tag-row">
-                            ${item.transport ? `<span class="tag"><i class="fa-solid fa-bus"></i> ${item.transport}</span>` : ''}
-                            ${item.money ? `<span class="tag"><i class="fa-solid fa-won-sign"></i> ${item.money}</span>` : ''}
-                        </div>
+        items.forEach((item, idx) => {
+            const row = document.createElement('div');
+            row.className = 'item-row';
+            row.onclick = () => openSheet(item);
+            row.innerHTML = `
+                <div class="drag-handle"><span></span><span></span><span></span></div>
+                ${item.time && activeTab !== 'start' ? `<div class="time-label">${item.time}</div>` : ''}
+                <div class="content-box">
+                    <div class="item-name">${item.name}</div>
+                    ${item.detail ? `<div class="item-desc">${item.detail}</div>` : ''}
+                    <div class="tag-row">
+                        ${item.transport ? `<span class="tag"><i class="fa-solid fa-bus"></i> ${item.transport}</span>` : ''}
+                        ${item.money ? `<span class="tag"><i class="fa-solid fa-won-sign"></i> ${item.money}</span>` : ''}
                     </div>
-                    <div class="emoji-icon" onclick="handleItemClick(${idx})">${item.emoji || '📍'}</div>
-                `;
-                list.appendChild(row);
-            });
-        }
+                </div>
+                <div class="emoji-icon">${item.emoji || '📍'}</div>
+            `;
+            list.appendChild(row);
+        });
 
         card.appendChild(list);
         area.appendChild(card);
         
-        if (activeTab !== 'heart' || currentFilter === '全部') {
-            new Sortable(list, { 
-                handle: '.drag-handle',
-                animation: 200,
-                ghostClass: 'sortable-ghost',
-                dragClass: 'sortable-drag',
-                onEnd: (evt) => {
-                    const arr = (activeTab === 'start' || activeTab === 'heart') ? appData[activeTab] : appData.days[activeTab];
-                    const [moved] = arr.splice(evt.oldIndex, 1);
-                    arr.splice(evt.newIndex, 0, moved);
-                    save();
-                }
-            });
-        }
+        new Sortable(list, { handle: '.drag-handle', animation: 200 });
     }
 
-    function handleItemClick(idx) {
-        const arr = (activeTab === 'start' || activeTab === 'heart') ? appData[activeTab] : appData.days[activeTab];
-        let item;
-        if (activeTab === 'heart' && currentFilter !== '全部') {
-             item = appData.heart.filter(i => 
-                (i.name && i.name.includes(currentFilter)) || 
-                (i.address && i.address.includes(currentFilter)) ||
-                (i.detail && i.detail.includes(currentFilter))
-            )[idx];
-            currentIndex = appData.heart.findIndex(i => i.id === item.id);
-        } else {
-            currentIndex = idx;
-            item = arr[idx];
-        }
-        openSheet(currentIndex, item);
-    }
-
-    function openSheet(idx, item) {
+    function openSheet(item) {
         document.getElementById('sheet-name').innerText = item.name;
         document.getElementById('sheet-overlay').style.display = 'flex';
 
         document.getElementById('sheet-nav-btn').onclick = () => {
             if (!item.address) {
-                alert("此行程無地址資訊，請編輯後導航");
+                alert("此項目無地址資訊");
             } else {
-                let url = `https://map.naver.com/v5/search/${encodeURIComponent(item.address)}`;
-                window.open(url, '_blank');
-            }
-            closeSheet();
-        };
-
-        document.getElementById('sheet-edit-btn').onclick = () => {
-            closeSheet();
-            openEdit(idx);
-        };
-
-        document.getElementById('sheet-del-btn').onclick = () => {
-            if (confirm(`確定刪除「${item.name}」？`)) {
-                const arr = (activeTab === 'start' || activeTab === 'heart') ? appData[activeTab] : appData.days[activeTab];
-                arr.splice(idx, 1);
-                save();
+                window.open(`https://map.naver.com/v5/search/${encodeURIComponent(item.address)}`, '_blank');
             }
             closeSheet();
         };
     }
 
     function closeSheet() { document.getElementById('sheet-overlay').style.display = 'none'; }
-
-    function openEdit(idx = -1) {
-        currentIndex = idx;
-        const arr = (activeTab === 'start' || activeTab === 'heart') ? appData[activeTab] : appData.days[activeTab];
-        const item = idx === -1 ? { name: '', emoji: '📍', time: '', address: '', detail: '', transport: '', money: '' } : arr[idx];
-
-        document.getElementById('in-name').value = item.name || '';
-        document.getElementById('in-emoji').value = item.emoji || '';
-        document.getElementById('in-time').value = item.time || '';
-        document.getElementById('in-address').value = item.address || '';
-        document.getElementById('in-transport').value = item.transport || '';
-        document.getElementById('in-money').value = item.money || '';
-        document.getElementById('in-detail').value = item.detail || '';
-        
-        document.getElementById('modal-title').innerText = idx === -1 ? '新增項目' : '編輯行程';
-        document.getElementById('modal-overlay').style.display = 'flex';
-    }
-
-    function saveEdit() {
-        const name = document.getElementById('in-name').value;
-        if (!name) return;
-
-        const arr = (activeTab === 'start' || activeTab === 'heart') ? appData[activeTab] : appData.days[activeTab];
-        const updated = {
-            id: currentIndex === -1 ? Date.now().toString() : arr[currentIndex].id,
-            name: name,
-            emoji: document.getElementById('in-emoji').value,
-            time: document.getElementById('in-time').value,
-            address: document.getElementById('in-address').value,
-            transport: document.getElementById('in-transport').value,
-            money: document.getElementById('in-money').value,
-            detail: document.getElementById('in-detail').value
-        };
-
-        if (currentIndex === -1) arr.push(updated);
-        else arr[currentIndex] = updated;
-
-        save();
-        closeModal();
-    }
-
-    function save() {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
-        render();
-    }
-
-    function closeModal() { document.getElementById('modal-overlay').style.display = 'none'; }
 
     document.getElementById('main-nav').onclick = (e) => {
         const btn = e.target.closest('.nav-btn');
@@ -491,12 +337,8 @@
         render();
     };
 
-    document.getElementById('add-btn').onclick = () => openEdit();
-    document.getElementById('save-btn').onclick = saveEdit;
-
     window.onclick = (e) => {
         if (e.target.id === 'sheet-overlay') closeSheet();
-        if (e.target.id === 'modal-overlay') closeModal();
     };
 
     window.onload = render;
