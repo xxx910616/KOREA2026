@@ -309,7 +309,7 @@
             
             const timeTag = (item.time && activeTab !== 'start') ? `<div class="time-label">${item.time}</div>` : '';
             const descTag = item.detail ? `<div class="item-desc">${item.detail}</div>` : '';
-            const addrTag = (activeTab === 'heart' && item.address) ? `<div class="item-desc" style="color:var(--accent-blue)">📍 點擊查看地點</div>` : '';
+            const addrTag = (activeTab === 'heart' && item.address) ? `<div class="item-desc" style="color:var(--accent-blue)"></div>` : '';
             
             // 已移除所有交通方式標籤前方的小人圖示
             row.innerHTML = `
