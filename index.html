@@ -36,11 +36,12 @@
         header h1 { font-size: 26px; font-weight: 700; color: var(--accent-blue); margin: 0; letter-spacing: 2px; }
         header p { font-size: 12px; color: var(--text-light); margin-top: 5px; }
 
+        /* 導航列優化 */
         .nav-scroller {
-            background: rgba(255, 255, 255, 0.85);
+            background: rgba(255, 255, 255, 0.9);
             backdrop-filter: blur(10px);
             border-radius: 30px; padding: 5px;
-            display: flex; justify-content: space-between;
+            display: flex; gap: 5px;
             position: sticky; top: 15px; z-index: 1000;
             box-shadow: var(--shadow); margin-bottom: 25px;
             border: 1px solid rgba(255,255,255,0.3);
@@ -51,18 +52,19 @@
 
         .nav-btn {
             border: none; background: none; flex-shrink: 0;
-            padding: 10px 15px; font-size: 12px; font-weight: 700;
+            padding: 10px 18px; font-size: 13px; font-weight: 700;
             color: var(--text-light); border-radius: 25px;
             cursor: pointer; transition: all 0.2s ease;
-            text-align: center;
+            text-align: center; line-height: 1.2;
         }
-        .nav-btn span { display: block; font-size: 9px; opacity: 0.7; font-weight: 400; }
+        .nav-btn span { display: block; font-size: 10px; opacity: 0.7; font-weight: 400; margin-top: 2px; }
 
         .nav-btn.active { 
             background: var(--active-yellow); color: #5a6a7a;
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
 
+        /* 標籤過濾 */
         .filter-scroller {
             display: flex; gap: 8px; overflow-x: auto;
             margin-bottom: 15px; padding-bottom: 5px;
@@ -78,11 +80,14 @@
             background: var(--accent-blue); color: white; border-color: var(--accent-blue);
         }
 
+        /* 卡片設計 */
         .card {
             background: var(--card-bg); border-radius: 30px; padding: 20px;
             box-shadow: var(--shadow); margin-bottom: 20px;
             border: 1px solid rgba(255,255,255,0.5);
+            animation: fadeIn 0.4s ease-out;
         }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         .section-header { 
             font-size: 15px; font-weight: 700; color: var(--accent-blue); 
@@ -95,47 +100,55 @@
             background: white; border-radius: 20px; padding: 14px 18px;
             display: flex; align-items: center; gap: 15px;
             border: 1px solid #f1f5f9; cursor: pointer; position: relative;
-            transition: transform 0.1s, box-shadow 0.2s;
+            transition: all 0.2s;
         }
-        .item-row:active { transform: scale(0.98); background: #fcfcfc; }
+        .item-row:active { transform: scale(0.97); background: #f8fafc; }
 
         .time-label { font-size: 13px; font-weight: 700; color: var(--accent-blue); width: 45px; flex-shrink: 0; }
         .content-box { flex: 1; min-width: 0; }
-        .item-name { font-size: 14px; font-weight: 600; color: #334155; margin-bottom: 3px; line-height: 1.4; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .item-desc { font-size: 11px; color: var(--text-light); line-height: 1.3; }
+        .item-name { font-size: 14px; font-weight: 600; color: #334155; margin-bottom: 3px; line-height: 1.4; }
+        .item-desc { font-size: 11px; color: var(--text-light); line-height: 1.3; margin-bottom: 4px; }
         
-        .tag-row { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 6px; }
+        .tag-row { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 4px; }
         .tag {
             background: var(--tag-bg); color: #64748b; padding: 2px 8px;
             border-radius: 6px; font-size: 10px; font-weight: 700;
             display: inline-flex; align-items: center; gap: 3px;
         }
-        .emoji-icon { font-size: 20px; flex-shrink: 0; }
+        .emoji-icon { font-size: 24px; flex-shrink: 0; width: 32px; text-align: center; }
 
         /* Bottom Sheet UI */
         .sheet-overlay {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+            position: fixed; inset: 0; background: rgba(0,0,0,0.4);
             backdrop-filter: blur(4px); display: none; z-index: 2000;
             align-items: flex-end;
         }
         .sheet {
             background: white; width: 100%; border-radius: 30px 30px 0 0;
-            padding: 25px; animation: slideUp 0.3s ease; max-width: 480px; margin: 0 auto;
+            padding: 25px 25px 40px 25px; animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+            max-width: 480px; margin: 0 auto;
         }
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-        .sheet-title { font-size: 16px; font-weight: 700; color: var(--accent-blue); margin-bottom: 20px; text-align: center; }
-        .sheet-options { display: flex; flex-direction: column; gap: 10px; }
+        
+        .sheet-handle { width: 40px; height: 4px; background: #e2e8f0; border-radius: 2px; margin: -10px auto 20px auto; }
+        .sheet-title { font-size: 18px; font-weight: 700; color: var(--text-main); margin-bottom: 8px; text-align: center; }
+        .sheet-addr { font-size: 12px; color: var(--text-light); text-align: center; margin-bottom: 25px; padding: 0 20px; word-break: break-all; }
+        
+        .sheet-options { display: flex; flex-direction: column; gap: 12px; }
         .sheet-btn {
-            width: 100%; padding: 15px; border-radius: 16px; border: none;
-            font-size: 14px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer;
+            width: 100%; padding: 16px; border-radius: 18px; border: none;
+            font-size: 15px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer;
+            transition: opacity 0.2s;
         }
-        .btn-nav { background: #e0f2fe; color: #0369a1; }
+        .sheet-btn:active { opacity: 0.8; }
+        .btn-nav { background: #0369a1; color: white; }
         .btn-cancel { background: #f1f5f9; color: #64748b; }
 
         .toast {
-            position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%);
-            background: rgba(0,0,0,0.7); color: white; padding: 10px 20px;
-            border-radius: 20px; font-size: 12px; z-index: 3000; display: none;
+            position: fixed; bottom: 50px; left: 50%; transform: translateX(-50%);
+            background: rgba(0,0,0,0.8); color: white; padding: 12px 24px;
+            border-radius: 25px; font-size: 13px; z-index: 3000; display: none;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
         }
     </style>
 </head>
@@ -162,9 +175,11 @@
 
 <div class="sheet-overlay" id="sheet-overlay">
     <div class="sheet">
+        <div class="sheet-handle"></div>
         <div class="sheet-title" id="sheet-name">項目名稱</div>
+        <div class="sheet-addr" id="sheet-addr">地址資訊</div>
         <div class="sheet-options">
-            <button class="sheet-btn btn-nav" id="sheet-nav-btn"><i class="fa-solid fa-location-arrow"></i> 導航 (Naver Map)</button>
+            <button class="sheet-btn btn-nav" id="sheet-nav-btn"><i class="fa-solid fa-location-arrow"></i> Naver Map 導航</button>
             <button class="sheet-btn btn-cancel" onclick="closeSheet()">關閉</button>
         </div>
     </div>
@@ -175,70 +190,70 @@
 <script>
     const appData = {
         start: [
-            { id: 's1', name: '自備插座轉接頭', detail: '圓形 4.8mm 雙孔', emoji: '🔌' },
-            { id: 's2', name: '總備現金', detail: 'TWD$5500約韓幣25萬 換幣詳細請參下列', emoji: '💰' },
-            { id: 's3', name: '換韓幣', detail: '台灣先換15萬韓幣/約台幣3千，剩餘10萬韓幣/約台幣2千5到明洞再換', emoji: '💰' },
-            { id: 's4', name: '另備用現金', detail: '除前項外另備3千-4千台幣備用', emoji: '💰' },
-            { id: 's5', name: '廣藏韓國被', detail: '買被子現金付款較划算刷卡店家會另收較高的手續費，單件雙人尺寸約韓幣6萬-12萬', emoji: '🧣' },
-            { id: 's6', name: '刷卡須知', detail: '手續費 1.5%，滿 ₩30000 可退稅', emoji: '💳' },
-            { id: 's7', name: '藝人韓服', detail: '預約 TWD 245/人', emoji: '👘' },
-            { id: 's8', name: '愛寶樂園門票', detail: '預約 TWD 705/人', emoji: '🎢' },
-            { id: 's9', name: 'ESIM 自備', detail: '$279/人', emoji: '📱' },
-            { id: 's10', name: '飯店 Aank Hotel Yeongdengpo branch', address: '서울 영등포구 영중로10길 10', emoji: '🏨' }
+            { id: 's1', name: '自備插座轉接頭', detail: '韓國插座為圓形 4.8mm 雙孔 (Type F)', emoji: '🔌' },
+            { id: 's2', name: '總備現金', detail: 'TWD$5500 約 ₩250,000 (換匯詳情見下)', emoji: '💰' },
+            { id: 's3', name: '換匯策略', detail: '台灣先換 ₩15萬，其餘 ₩10萬到明洞大使館換錢所換', emoji: '🪙' },
+            { id: 's4', name: '緊急備用金', detail: '另備 TWD$3,000 - 4,000 現金', emoji: '💵' },
+            { id: 's5', name: '廣藏市場棉被', detail: '現金付款較划算 (免手續費)，雙人尺寸約 ₩6~12萬', emoji: '🧣' },
+            { id: 's6', name: '購物退稅', detail: '刷卡手續費 1.5%，單筆滿 ₩30,000 可辦理退稅', emoji: '💳' },
+            { id: 's7', name: '預約：藝人韓服', detail: '已預約，費用約 TWD $245/人', emoji: '👘' },
+            { id: 's8', name: '預約：愛寶樂園', detail: '門票已購，費用約 TWD $705/人', emoji: '🎢' },
+            { id: 's9', name: '通訊：ESIM', detail: '自行準備，費用約 $279/人', emoji: '📱' },
+            { id: 's10', name: '飯店資訊', name_ko: '아늑호텔 영등포점', address: '서울 영등포구 영중로10길 10', detail: 'Aank Hotel Yeongdeungpo', emoji: '🏨' }
         ],
         days: {
             1: [
-                { id: 'd1-1', time: '21:35', name: '抵達仁川', emoji: '🛫', detail: '辦理出關' },
-                { id: 'd1-2', time: '22:30', name: '飯店 Check-in', emoji: '🏨', transport: '機場接送', money: '₩13000/人' },
-                { id: 'd1-3', time: '23:00', name: 'Oliveyoung Dootamall', emoji: '🪞', address: '서울 중구 장충단로 275 두산塔 B2層', transport: '夜間公車/UBER' },
-                { id: 'd1-4', time: '00:00', name: 'The mask shop', emoji: '🛍️', address: '서울 중구 퇴계로73길 36 1층', transport: '夜間公車/UBER' },
-                { id: 'd1-5', time: '01:00', name: '大成精肉店 대성정육식당', emoji: '🥩', address: '서울 용산구 보광동 63-2', transport: '夜間公車/UBER' },
-                { id: 'd1-6', time: '02:30', name: '飯店', emoji: '🏨', transport: '夜間公車/UBER' }
+                { id: 'd1-1', time: '21:35', name: '抵達仁川機場 (ICN)', emoji: '🛫', detail: '辦理入境與拿取行李' },
+                { id: 'd1-2', time: '22:30', name: '飯店 Check-in', emoji: '🏨', transport: '機場接送', money: '₩13,000/人' },
+                { id: 'd1-3', time: '23:00', name: 'Olive Young (Doota Mall)', emoji: '🪞', address: '서울 중구 장충단로 275 B2', transport: '夜間公車/Uber' },
+                { id: 'd1-4', time: '00:00', name: 'The Mask Shop', emoji: '🛍️', address: '서울 중구 퇴계로73길 36', transport: '夜間公車/Uber' },
+                { id: 'd1-5', time: '01:00', name: '大成精肉店 (대성정육식당)', emoji: '🥩', address: '서울 용산구 보광동 63-2', transport: '夜間公車/Uber' },
+                { id: 'd1-6', time: '02:30', name: '返回飯店', emoji: '🏨', transport: '夜間公車/Uber' }
             ],
             2: [
-                { id: 'd2-1', time: '09:00', name: '藝人韓服 연예인 한복', emoji: '👘', address: '서울 종로구 체부동 60-2', transport: '地鐵1+3' },
-                { id: 'd2-2', time: '11:30', name: 'Olive Better', emoji: '🍒', address: '서울 종로구 청진동 246', transport: '🚶🏻‍➡️' },
-                { id: 'd2-3', time: '12:30', name: '順美家幸福的醬蟹', emoji: '🦀', address: '서울 中區 乙支路6街 18-37', transport: '地鐵3+2' },
-                { id: 'd2-4', time: '15:30', name: '廣藏市場 광장시장', emoji: '🍢', address: '서울 종로구 예지동 2-1', transport: '🚶🏻‍➡️' },
-                { id: 'd2-5', time: '16:30', name: '明洞', emoji: '🏙️', address: '서울 中區 小公洞 1', transport: '地鐵1+4' },
-                { id: 'd2-6', time: '18:30', name: '樂天超市 롯데마트 서울역점', emoji: '🛒', address: '서울특별시 中區 靑波路 426', transport: '地鐵4' },
-                { id: 'd2-7', time: '20:00', name: '明倫進士燒烤', emoji: '🥩', address: '서울 영등포구 영등포동3가 16-2', transport: '🚶🏻‍➡️' },
-                { id: 'd2-8', time: '20:00', name: '飯店', emoji: '🏨', transport: '🚶🏻‍➡️' }
+                { id: 'd2-1', time: '09:00', name: '藝人韓服 (연예인 한복)', emoji: '👘', address: '서울 종羅區 體府洞 60-2', transport: '地鐵 1+3 號線' },
+                { id: 'd2-2', time: '11:30', name: 'Olive Better', emoji: '🍒', address: '서울 종로구 청진동 246', transport: '步行' },
+                { id: 'd2-3', time: '12:30', name: '順美家幸福的醬蟹', emoji: '🦀', address: '서울 중구 을지로6가 18-37', transport: '地鐵 3+2 號線' },
+                { id: 'd2-4', time: '15:30', name: '廣藏市場 (광장시장)', emoji: '🍢', address: '서울 종로구 예지동 2-1', transport: '步行' },
+                { id: 'd2-5', time: '16:30', name: '明洞商圈', emoji: '🏙️', address: '서울 중구 명동', transport: '地鐵 1+4 號線' },
+                { id: 'd2-6', time: '18:30', name: '樂天超市 (首爾站店)', emoji: '🛒', address: '서울특별시 중구 청파로 426', transport: '地鐵 4 號線' },
+                { id: 'd2-7', time: '20:00', name: '明倫進士燒烤', emoji: '🥩', address: '서울 영등포구 영등포동3가 16-2', transport: '步行' },
+                { id: 'd2-8', time: '21:30', name: '返回飯店', emoji: '🏨', transport: '步行' }
             ],
             3: [
-                { id: 'd3-1', time: '10:00', name: '安木豬肉湯飯 성수', emoji: '🐷', address: '서울 성동구 뚝섬로13길 34 1층', transport: '地鐵1+2' },
-                { id: 'd3-2', time: '12:00', name: '聖水洞 성수동', emoji: '☕', address: '서울 성동구 성수동', transport: '🚶🏻‍➡️' },
-                { id: 'd3-3', time: '15:00', name: 'JOJO刀削麵', emoji: '🍜', address: '서울 성동구 성수동2가 289-257', transport: '🚶🏻‍➡️' },
-                { id: 'd3-4', time: '18:00', name: '漢南洞 한남동', emoji: '🚇', address: '서울 용산구 한남동', transport: '地鐵2+6' },
-                { id: 'd3-5', time: '20:00', name: 'GOP牛腸 강남곱', emoji: '🥘', address: '서울 강남구 역삼로3길 12', transport: '公車/UBER' },
-                { id: 'd3-6', time: '22:00', name: '飯店', emoji: '🏨', transport: '地鐵6+5' }
+                { id: 'd3-1', time: '10:00', name: '安木豬肉湯飯 (聖水店)', emoji: '🐷', address: '서울 성동구 뚝섬로13길 34', transport: '地鐵 1+2 號線' },
+                { id: 'd3-2', time: '12:00', name: '聖水洞逛街', emoji: '☕', address: '서울 성동구 성수동', transport: '步行' },
+                { id: 'd3-3', time: '15:00', name: 'JOJO 刀削麵', emoji: '🍜', address: '서울 성동구 성수동2가 289-257', transport: '步行' },
+                { id: 'd3-4', time: '18:00', name: '漢南洞商圈', emoji: '🚇', address: '서울 용산구 한남동', transport: '地鐵 2+6 號線' },
+                { id: 'd3-5', time: '20:00', name: 'GOP 牛腸 (江南店)', emoji: '🥘', address: '서울 강남구 역삼로3길 12', transport: '公車/Uber' },
+                { id: 'd3-6', time: '22:00', name: '返回飯店', emoji: '🏨', transport: '地鐵 6+5 號線' }
             ],
             4: [
-                { id: 'd4-1', time: '08:00', name: '愛寶樂園 에버랜드', emoji: '🎢', address: '경기도 용인시 처인구 포곡읍 에버랜드로 199', transport: '專車' },
-                { id: 'd4-2', time: '15:00', name: '醫美 닥터디자이너의원', emoji: '🏥', address: '서울 중구 명動8가街 7', transport: '專車' },
-                { id: 'd4-3', time: '15:00', name: 'Jeuseu眼鏡 제우스안경', emoji: '👓', address: '서울 중구 明洞2街 31-7', transport: '專車' },
-                { id: 'd4-4', time: '17:00', name: '望遠>汝矣島 漢江夜景', emoji: '🚢', address: '서울 마포구 마포나루길 442', transport: '🚢' },
-                { id: 'd4-5', time: '17:00', name: '備案 弘大', emoji: '🛍️', address: '서울 마포구 동교동 165-5', transport: '地鐵2' },
-                { id: 'd4-6', time: '18:30', name: '汝矣島 No Brand', emoji: '🏪', address: '서울 영등포구 여의도동 17-3', transport: '🚶🏻‍➡️' },
-                { id: 'd4-7', time: '19:30', name: '二高家的小章魚', emoji: '🐙', address: '서울 영등포구 영등포동3가 11-11', transport: '公車/UBER' },
-                { id: 'd4-8', time: '20:30', name: '飯店', emoji: '🏨', transport: '🚶🏻‍➡️' }
+                { id: 'd4-1', time: '08:00', name: '愛寶樂園 (에버랜드)', emoji: '🎢', address: '경기도 용인시 처인구 포곡읍 에버랜드로 199', transport: '接駁專車' },
+                { id: 'd4-2', time: '15:00', name: '醫美：Dr. Designer', emoji: '🏥', address: '서울 중구 명동8가길 7', transport: '專車' },
+                { id: 'd4-3', time: '15:00', name: 'Jeuseu 眼鏡 (제우스안경)', emoji: '👓', address: '서울 중구 명동2가 31-7', transport: '專車' },
+                { id: 'd4-4', time: '17:00', name: '望遠/汝矣島 漢江夜景', emoji: '🚢', address: '서울 마포구 마포나루길 442', transport: '交通船/步行' },
+                { id: 'd4-5', time: '17:00', name: '備案：弘大商圈', emoji: '🛍️', address: '서울 마포구 동교동 165-5', transport: '地鐵 2 號線' },
+                { id: 'd4-6', time: '18:30', name: '汝矣島 No Brand', emoji: '🏪', address: '서울 영등포구 여의도동 17-3', transport: '步行' },
+                { id: 'd4-7', time: '19:30', name: '二高家的小章魚', emoji: '🐙', address: '서울 영등포구 영등포동3가 11-11', transport: '公車/Uber' },
+                { id: 'd4-8', time: '21:00', name: '返回飯店', emoji: '🏨' }
             ],
             5: [
-                { id: 'd5-1', time: '10:30', name: '出發往機場', emoji: '🛫', transport: '機場接送', detail: '準備返台' },
-                { id: 'd5-2', time: '14:45', name: '搭機返台', emoji: '✈️', detail: '航班回程' }
+                { id: 'd5-1', time: '10:30', name: '出發往機場', emoji: '🛫', transport: '機場接送', detail: '最後整理行李' },
+                { id: 'd5-2', time: '14:45', name: '搭機返台', emoji: '✈️', detail: '期待下一次旅行' }
             ]
         },
         heart: [
-            { id: 'h1', name: '聖水洞 ONGO 온고', emoji: '👒', address: '서울 성동구 성수동2가 301-64' },
-            { id: 'h2', name: '延南洞 CU甜點公園', emoji: '🌳', address: '서울 마포구 연남동' },
+            { id: 'h1', name: '聖水洞 ONGO (온고)', emoji: 'Hat', address: '서울 성동구 성수동2가 301-64' },
+            { id: 'h2', name: '延南洞 CU 甜點公園', emoji: '🌳', address: '서울 마포구 연남동' },
             { id: 'h3', name: '聖水洞 MAMAN GELATO', emoji: '🍦', address: '서울 성동구 성수동2가 315-18' },
             { id: 'h4', name: '聖水洞 Milky Shop', emoji: '🍪', address: '서울 성동구 성수동2가 301-52' },
-            { id: 'h5', name: '明洞 FRESH BREAD FACTORY', emoji: '🥐', address: '서울 중구 명동1가 34-1' },
+            { id: 'h5', name: '明洞 Fresh Bread Factory', emoji: '🥐', address: '서울 중구 명동1가 34-1' },
             { id: 'h6', name: '明洞 烤起司年糕', emoji: '🧀', address: '서울 중구 명동1가 61-2' },
-            { id: 'h7', name: '明洞 大創旗艦店', emoji: '📃', address: '서울 중구 퇴계로 134-1' },
+            { id: 'h7', name: '明洞 大創旗艦店 (Daiso)', emoji: '📃', address: '서울 중구 퇴계로 134-1' },
             { id: 'h8', name: '明洞 明朗熱狗', emoji: '🌭', address: '서울 중구 명동2가 101-3' },
-            { id: 'h9', name: '明洞 Berrynew藥局', emoji: '💊', address: '서울 중구 명동2가 51-18' },
-            { id: 'h10', name: '弘大 chung chung', emoji: '👖', address: '서울 마포구 서교동 365-26' }
+            { id: 'h9', name: '明洞 Berrynew 藥局', emoji: '💊', address: '서울 중구 명동2가 51-18' },
+            { id: 'h10', name: '弘大 Chung Chung (牛仔褲)', emoji: '👖', address: '서울 마포구 서교동 365-26' }
         ]
     };
 
@@ -249,6 +264,7 @@
         const area = document.getElementById('content-area');
         area.innerHTML = '';
         
+        // 渲染收藏分類
         if (activeTab === 'heart') {
             const filterDiv = document.createElement('div');
             filterDiv.className = 'filter-scroller';
@@ -270,11 +286,12 @@
         card.className = 'card';
 
         let headerTxt = '';
-        if (activeTab === 'start') headerTxt = '行前備忘';
-        else if (activeTab === 'heart') headerTxt = '收藏清單';
-        else headerTxt = `Day ${activeTab} 行程`;
+        let icon = 'calendar-day';
+        if (activeTab === 'start') { headerTxt = '行前備忘'; icon = 'clipboard-list'; }
+        else if (activeTab === 'heart') { headerTxt = '收藏清單'; icon = 'heart'; }
+        else { headerTxt = `Day ${activeTab} 行程`; }
 
-        card.innerHTML = `<div class="section-header"><i class="fa-solid fa-calendar-day"></i> ${headerTxt}</div>`;
+        card.innerHTML = `<div class="section-header"><i class="fa-solid fa-${icon}"></i> ${headerTxt}</div>`;
 
         const list = document.createElement('div');
         list.className = 'item-list';
@@ -292,13 +309,19 @@
             const row = document.createElement('div');
             row.className = 'item-row';
             row.onclick = () => openSheet(item);
+            
+            const timeTag = (item.time && activeTab !== 'start') ? `<div class="time-label">${item.time}</div>` : '';
+            const descTag = item.detail ? `<div class="item-desc">${item.detail}</div>` : '';
+            const addrTag = (activeTab === 'heart' && item.address) ? `<div class="item-desc" style="color:var(--accent-blue)">📍 點擊查看地點</div>` : '';
+            
             row.innerHTML = `
-                ${item.time && activeTab !== 'start' ? `<div class="time-label">${item.time}</div>` : ''}
+                ${timeTag}
                 <div class="content-box">
                     <div class="item-name">${item.name}</div>
-                    ${item.detail ? `<div class="item-desc">${item.detail}</div>` : ''}
+                    ${descTag}
+                    ${addrTag}
                     <div class="tag-row">
-                        ${item.transport ? `<span class="tag"><i class="fa-solid fa-bus"></i> ${item.transport}</span>` : ''}
+                        ${item.transport ? `<span class="tag"><i class="fa-solid fa-person-walking"></i> ${item.transport}</span>` : ''}
                         ${item.money ? `<span class="tag"><i class="fa-solid fa-won-sign"></i> ${item.money}</span>` : ''}
                     </div>
                 </div>
@@ -309,23 +332,46 @@
 
         card.appendChild(list);
         area.appendChild(card);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     function openSheet(item) {
-        document.getElementById('sheet-name').innerText = item.name;
-        document.getElementById('sheet-overlay').style.display = 'flex';
+        if (!item.address && !item.detail) return; // 沒有內容則不彈窗
 
-        document.getElementById('sheet-nav-btn').onclick = () => {
-            if (!item.address) {
-                showToast("此項目無地址資訊");
-            } else {
-                window.open(`https://map.naver.com/v5/search/${encodeURIComponent(item.address)}`, '_blank');
-            }
-            closeSheet();
-        };
+        document.getElementById('sheet-name').innerText = item.name;
+        document.getElementById('sheet-addr').innerText = item.address || item.detail || "";
+        
+        const navBtn = document.getElementById('sheet-nav-btn');
+        if (item.address) {
+            navBtn.style.display = 'flex';
+            navBtn.onclick = () => {
+                const query = encodeURIComponent(item.address);
+                // 優先嘗試喚起 Naver Map App，失敗則開網頁
+                const webUrl = `https://map.naver.com/v5/search/${query}`;
+                const appUrl = `nmap://search?query=${query}&appname=com.your.app`;
+                
+                const start = Date.now();
+                window.location.href = appUrl;
+                
+                setTimeout(() => {
+                    if (Date.now() - start < 1500) {
+                        window.open(webUrl, '_blank');
+                    }
+                }, 1000);
+                closeSheet();
+            };
+        } else {
+            navBtn.style.display = 'none';
+        }
+
+        document.getElementById('sheet-overlay').style.display = 'flex';
+        document.body.style.overflow = 'hidden'; // 防止背景滾動
     }
 
-    function closeSheet() { document.getElementById('sheet-overlay').style.display = 'none'; }
+    function closeSheet() { 
+        document.getElementById('sheet-overlay').style.display = 'none'; 
+        document.body.style.overflow = 'auto';
+    }
 
     function showToast(msg) {
         const toast = document.getElementById('toast');
@@ -341,6 +387,10 @@
         btn.classList.add('active');
         activeTab = btn.dataset.tab;
         currentFilter = '全部';
+        
+        // 自動將按鈕滾動到可見區域
+        btn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+        
         render();
     };
 
@@ -352,4 +402,4 @@
 </script>
 
 </body>
-</html>eof
+</html>
