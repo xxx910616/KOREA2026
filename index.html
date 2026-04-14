@@ -251,6 +251,7 @@
             { id: 'h7', name: '明洞 大創旗艦店', emoji: '📃', address: '서울 중구 퇴계로 134-1' },
             { id: 'h8', name: '明洞 明朗熱狗', emoji: '🌭', address: '서울 중구 명동2가 101-3' },
             { id: 'h9', name: '明洞 Berrynew 藥局', emoji: '💊', address: '서울 중구 명동2가 51-18' },
+            { id: 'h10', name: '漢南洞 Hetras', emoji: '🧴', address: '서울 용산구 한남동 739-8' },
             { id: 'h10', name: '弘大 Chung Chung (牛仔褲)', emoji: '👖', address: '서울 마포구 서교동 365-26' }
         ]
     };
@@ -265,7 +266,7 @@
         if (activeTab === 'heart') {
             const filterDiv = document.createElement('div');
             filterDiv.className = 'filter-scroller';
-            const categories = ['全部', '聖水洞', '明洞', '弘大'];
+            const categories = ['全部', '聖水洞', '明洞', '弘大', '漢南洞'];
             categories.forEach(cat => {
                 const chip = document.createElement('div');
                 chip.className = `filter-chip ${currentFilter === cat ? 'active' : ''}`;
